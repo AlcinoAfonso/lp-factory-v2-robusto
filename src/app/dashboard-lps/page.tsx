@@ -23,10 +23,10 @@ function scanLPs(): Cliente[] {
     const items = fs.readdirSync(appDir, { withFileTypes: true });
     
     for (const item of items) {
-      // Ignora arquivos e pastas especiais
+      // ✅ CORREÇÃO: Ignora arquivos e pastas especiais (incluindo [...slug])
       if (!item.isDirectory() || 
           item.name.startsWith('.') || 
-          ['components', 'globals.css', 'layout.tsx', 'page.tsx', 'dashboard-lps'].includes(item.name)) {
+          ['components', 'dashboard-lps', '[...slug]'].includes(item.name)) {
         continue;
       }
 
