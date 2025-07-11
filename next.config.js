@@ -8,7 +8,8 @@ function loadClientsFromFolders() {
   try {
     const folders = fs.readdirSync(appDir, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
-      .filter(dirent => !['components', 'dashboard-lps'].includes(dirent.name));
+      .filter(dirent => !['components', 'dashboard-lps', '[...slug]'].includes(dirent.name));
+    
     for (const folder of folders) {
       const domainFile = path.join(appDir, folder.name, 'domain.json');
       if (fs.existsSync(domainFile)) {
@@ -37,26 +38,26 @@ const nextConfig = {
   compress: true,
   async rewrites() {
     const clients = loadClientsFromFolders();
-    const clientRewrites = clients.flatMap(({ domain, folder }) => [
-      {
-        source: '/',
-        has: [{ type: 'host', value: domain }],
-        destination: `/${folder}`,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: domain }],
-        destination: `/${folder}/:path*`,
-      },
-    ]);
+    
+    // 🎯 FASE 1: Rewrite apenas homepage de domínios personalizados
+    const clientRewrites = clients.map(({ domain, folder }) => ({
+      // Homepage: unicodigital.com.br/ → força [...slug] a capturar
+      source: '/',
+      has: [{ type: 'host', value: domain }],
+      destination: '/homepage', // Rota que não existe → [...slug] captura
+    }));
+
     console.log(`\n🔗 Domínios configurados: ${clients.length}`);
     clients.forEach(({ folder, domain }) => {
-      console.log(`   ✅ /${folder} → ${domain}`);
+      console.log(`   ✅ ${domain} → [...slug] (${folder})`);
     });
     console.log('');
+    
     return clientRewrites;
   },
-  async redirects() { return []; },
+  async redirects() { 
+    return []; 
+  },
 };
 
 module.exports = nextConfig;
