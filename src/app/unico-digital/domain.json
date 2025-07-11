@@ -1,4 +1,13 @@
 {
   "domain": "unicodigital.com.br",
-  "active": true
+  "active": true,
+  "homepage": "principal",
+  "lps": {
+    "principal": {
+      "folder": ".",
+      "slug": "",
+      "title": "LP Factory - Criação de Landing Pages",
+      "active": true
+    }
+  }
 }
