@@ -1,1 +1,196 @@
+{
+  "metadata": {
+    "title": "Perca 10kg em 90 Dias - Método FitNutri de Emagrecimento Saudável",
+    "description": "Transforme seu corpo com nosso método exclusivo de emagrecimento. Cardápio personalizado, acompanhamento diário e resultados garantidos em 90 dias.",
+    "favicon": "/favicon.ico"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "type": "header",
+      "backgroundColor": "#ffffff",
+      "textColor": "#1a1a1a",
+      "logo": {
+        "type": "text",
+        "text": "FitNutri",
+        "subtitle": "Emagrecimento Inteligente"
+      },
+      "navigation": [
+        {"label": "Método", "href": "#benefits"},
+        {"label": "Resultados", "href": "#testimonials"},
+        {"label": "Preços", "href": "#pricing"},
+        {"label": "Depoimentos", "href": "#steps"}
+      ],
+      "phone": {
+        "display": "(11) 99999-5555",
+        "link": "tel:+5511999995555"
+      }
+    },
+    {
+      "id": "hero",
+      "type": "hero",
+      "backgroundColor": "#fef3e8",
+      "textColor": "#1a1a1a",
+      "title": "Perca 10kg em 90 Dias Sem Dietas Malucas",
+      "description": "Método científico comprovado para emagrecimento saudável e duradouro. Sem passar fome, sem efeito sanfona, com acompanhamento nutricional completo.",
+      "primaryButton": {
+        "text": "Quero Emagrecer Agora",
+        "href": "https://wa.me/5511999995555?text=Quero%20emagrecer%2010kg%20em%2090%20dias%20com%20a%20FitNutri",
+        "variant": "primary"
+      },
+      "secondaryButton": {
+        "text": "Ver Transformações",
+        "href": "#testimonials",
+        "variant": "outline"
+      },
+      "image": {
+        "src": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800",
+        "alt": "Mulher feliz após emagrecimento saudável"
+      }
+    },
+    {
+      "id": "benefits",
+      "type": "benefits",
+      "backgroundColor": "#ffffff",
+      "textColor": "#1a1a1a",
+      "title": "Por Que Nosso Método de Emagrecimento Funciona?",
+      "items": [
+        {
+          "icon": "⚖️",
+          "title": "Perda Sustentável",
+          "description": "Perca peso de forma gradual e saudável, sem efeito sanfona. Resultados que permanecem."
+        },
+        {
+          "icon": "🍽️",
+          "title": "Sem Passar Fome",
+          "description": "Cardápios balanceados que saciam e nutrem. Você come bem enquanto emagrece."
+        },
+        {
+          "icon": "📉",
+          "title": "Déficit Inteligente",
+          "description": "Calculamos o déficit calórico ideal para seu metabolismo e estilo de vida."
+        },
+        {
+          "icon": "🎯",
+          "title": "Meta Realista",
+          "description": "10kg em 90 dias é uma meta saudável e alcançável para a maioria das pessoas."
+        },
+        {
+          "icon": "📊",
+          "title": "Acompanhamento Semanal",
+          "description": "Medições, bioimpedância e ajustes semanais para garantir progresso constante."
+        },
+        {
+          "icon": "💪",
+          "title": "Energia e Disposição",
+          "description": "Além de emagrecer, você ganha energia, melhora o humor e a autoestima."
+        }
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "steps",
+      "backgroundColor": "#f9fafb",
+      "textColor": "#1a1a1a",
+      "title": "Como Funciona o Método de Emagrecimento",
+      "steps": [
+        {
+          "title": "1. Avaliação Metabólica Completa",
+          "description": "Analisamos seu perfil metabólico, histórico de peso, exames e calculamos suas necessidades calóricas específicas para emagrecimento."
+        },
+        {
+          "title": "2. Cardápio Personalizado para Déficit",
+          "description": "Criamos um plano alimentar com déficit calórico inteligente, priorizando saciedade e nutrientes essenciais."
+        },
+        {
+          "title": "3. Acompanhamento Semanal Intensivo",
+          "description": "Monitoramento da perda de peso, ajustes no cardápio e motivação constante para manter o foco no objetivo."
+        },
+        {
+          "title": "4. Manutenção do Peso Ideal",
+          "description": "Após atingir a meta, ensinamos como manter o peso ideal para sempre, sem recuperar os quilos perdidos."
+        }
+      ],
+      "button": {
+        "text": "Começar Meu Emagrecimento",
+        "href": "https://wa.me/5511999995555?text=Quero%20começar%20a%20emagrecer%20com%20o%20método%20FitNutri",
+        "variant": "primary"
+      }
+    },
+    {
+      "id": "testimonials",
+      "type": "testimonials",
+      "backgroundColor": "#fef3e8",
+      "textColor": "#1a1a1a",
+      "title": "Transformações Reais: Quem Perdeu 10kg+",
+      "videos": [
+        {
+          "embedUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+          "title": "Marina perdeu 12kg em 3 meses"
+        },
+        {
+          "embedUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ", 
+          "title": "Roberto eliminou 15kg sem passar fome"
+        },
+        {
+          "embedUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+          "title": "Claudia conquistou o corpo dos sonhos"
+        }
+      ]
+    },
+    {
+      "id": "faq",
+      "type": "faq",
+      "backgroundColor": "#ffffff",
+      "textColor": "#1a1a1a",
+      "title": "Dúvidas Sobre o Emagrecimento",
+      "items": [
+        {
+          "question": "É possível mesmo perder 10kg em 90 dias?",
+          "answer": "Sim! Perder 10kg em 90 dias equivale a aproximadamente 1kg por semana, que é considerado um ritmo saudável e sustentável de emagrecimento pela comunidade médica."
+        },
+        {
+          "question": "Vou passar fome durante o processo?",
+          "answer": "Não! Nosso método prioriza a saciedade. Você come de 3 em 3 horas com alimentos nutritivos que controlam a fome naturalmente."
+        },
+        {
+          "question": "E se eu não conseguir perder os 10kg?",
+          "answer": "Oferecemos garantia de resultados. Se seguir o método corretamente e não atingir pelo menos 8kg de perda, devolvemos seu investimento."
+        },
+        {
+          "question": "Preciso fazer exercícios obrigatoriamente?",
+          "answer": "Não é obrigatório, mas recomendamos caminhadas leves. No plano VIP incluímos exercícios específicos que aceleram o emagrecimento."
+        }
+      ]
+    },
+    {
+      "id": "ctaFinal",
+      "type": "ctaFinal",
+      "backgroundColor": "#dc2626",
+      "textColor": "#ffffff",
+      "title": "Comece Sua Transformação Hoje!",
+      "subtitle": "Mais de 2.000 pessoas já perderam peso com nosso método. Você será a próxima?",
+      "button": {
+        "text": "Quero Perder 10kg Agora",
+        "href": "https://wa.me/5511999995555?text=Quero%20começar%20meu%20emagrecimento%20hoje%20mesmo",
+        "variant": "primary"
+      }
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "backgroundColor": "#1a1a1a",
+      "textColor": "#ffffff",
+      "instagram": {
+        "url": "https://instagram.com/fitnutri.emagrecimento",
+        "text": "@fitnutri.emagrecimento"
+      },
+      "copyright": "© 2025 FitNutri. Todos os direitos reservados.",
+      "legalLink": {
+        "text": "Termos de Uso e Privacidade",
+        "href": "/termos"
+      }
+    }
+  ]
+}
 
