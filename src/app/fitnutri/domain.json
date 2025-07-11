@@ -1,0 +1,19 @@
+{
+  "domain": "fitnutri.com.br",
+  "active": false,
+  "homepage": "principal",
+  "lps": {
+    "principal": {
+      "folder": "lp-principal",
+      "slug": "",
+      "title": "FitNutri - Nutrição Personalizada",
+      "active": true
+    },
+    "emagrecimento": {
+      "folder": "lp-emagrecimento", 
+      "slug": "emagrecimento",
+      "title": "Perca 10kg em 90 Dias - FitNutri",
+      "active": true
+    }
+  }
+}
