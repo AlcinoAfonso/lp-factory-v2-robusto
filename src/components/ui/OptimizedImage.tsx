@@ -7,6 +7,11 @@ import { cn } from '@/lib/utils';
 interface OptimizedImageProps {
   src: string;
   alt: string;
+  /**
+   * Optionally tag the image with the section where it's used. This prop is
+   * currently informational only and has no functional effect.
+   */
+  section?: string;
   className?: string;
   priority?: boolean;
   sizes?: string;
@@ -19,6 +24,7 @@ interface OptimizedImageProps {
 export function OptimizedImage({
   src,
   alt,
+  section: _section,
   className,
   priority = false,
   sizes = '100vw',
