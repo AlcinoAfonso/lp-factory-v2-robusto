@@ -1,7 +1,7 @@
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { TechnologyData } from '@/types/lp-config';
 import { Button } from '@/components/ui/Button';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { sectionDefaults } from '@/config/sections';
 import { typography } from '@/config/typography';
 
@@ -53,15 +53,15 @@ function Technology({ data }: TechnologyProps) {
           </div>
 
           <div className={sectionDefaults.technology.imageContainer}>
-            <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src={data.image.src}
-                alt={data.image.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 400px"
-              />
-            </div>
+            <OptimizedImage
+              src={data.image.src}
+              alt={data.image.alt}
+              width={400}
+              height={400}
+              section="other"
+              className="w-full max-w-md mx-auto aspect-square rounded-2xl shadow-xl"
+              sizes="(max-width: 768px) 100vw, 400px"
+            />
           </div>
         </div>
 
