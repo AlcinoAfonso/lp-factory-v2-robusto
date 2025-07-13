@@ -76,7 +76,7 @@ function hasValidConfig(config: any): boolean {
   return config && config.lps && typeof config.lps === 'object' && config.homepage;
 }
 
-// 🎯 SISTEMA ÚNICO: Escanear LPs de qualquer cliente
+// 🎯 SISTEMA CORRIGIDO: Escanear LPs baseado apenas no domain.json
 function scanClientLPs(clientName: string, domainConfig: any): LP[] {
   const lps: LP[] = [];
   
@@ -89,12 +89,13 @@ function scanClientLPs(clientName: string, domainConfig: any): LP[] {
     for (const [lpKey, lpData] of Object.entries(lpsConfig)) {
       const lpConfig = lpData as any;
       
-      // Verificar se pasta da LP existe
+      // ✅ CORREÇÃO: Verificar apenas se lp.json existe
       const lpFolder = lpConfig.folder === '.' ? '' : lpConfig.folder;
-      const lpPath = path.join(process.cwd(), 'src/app', clientName, lpFolder);
-      const pageFile = path.join(lpPath, 'page.tsx');
+      const lpJsonPath = lpFolder 
+        ? path.join(process.cwd(), 'src/app', clientName, lpFolder, 'lp.json')
+        : path.join(process.cwd(), 'src/app', clientName, 'lp.json');
       
-      if (fs.existsSync(pageFile)) {
+      if (fs.existsSync(lpJsonPath)) {
         // Determinar URL baseada no slug
         const slug = lpConfig.slug || '';
         const isHomepage = lpKey === homepage;
@@ -110,7 +111,7 @@ function scanClientLPs(clientName: string, domainConfig: any): LP[] {
         
         lps.push(newLP);
       } else {
-        console.warn(`❌ Page.tsx não encontrado para ${clientName}/${lpKey}`);
+        console.warn(`❌ lp.json não encontrado para ${clientName}/${lpKey} em ${lpJsonPath}`);
       }
     }
     
@@ -189,6 +190,8 @@ function ClienteItem({ cliente }: { cliente: Cliente }) {
 export default function DashboardLPs() {
   const clientes = scanLPs();
   const totalLPs = clientes.reduce((total, cliente) => total + cliente.lps.length, 0);
+  const principaisCount = clientes.filter(c => c.lps.some(lp => lp.type === 'principal')).length;
+  const secundariasCount = totalLPs - principaisCount;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -203,7 +206,7 @@ export default function DashboardLPs() {
           </p>
           <div className="mt-4 text-sm text-gray-500">
             Total: {clientes.length} cliente{clientes.length !== 1 ? 's' : ''} • {' '}
-            {totalLPs} LPs ({clientes.filter(c => c.lps.some(lp => lp.type === 'principal')).length} principais + {totalLPs - clientes.filter(c => c.lps.some(lp => lp.type === 'principal')).length} secundárias)
+            {totalLPs} LPs ({principaisCount} principais + {secundariasCount} secundárias)
           </div>
         </div>
 
@@ -242,6 +245,9 @@ export default function DashboardLPs() {
             <p className="mt-2">
               🏠 <strong>LP Principal:</strong> homepage do cliente • 
               🔗 <strong>LPs Secundárias:</strong> páginas específicas/campanhas
+            </p>
+            <p className="mt-2">
+              ✅ <strong>Sistema Universal:</strong> Detecta LPs através do domain.json (não requer page.tsx individual)
             </p>
           </div>
         </div>
