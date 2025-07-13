@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 import { GalleryData } from '@/types/lp-config';
 
 interface GalleryProps {
@@ -35,7 +35,7 @@ const Gallery: React.FC<GalleryProps> = ({ data }) => {
               key={index}
               className="relative aspect-video rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
             >
-              <Image
+              <SmartImage
                 src={image.src}
                 alt={image.alt}
                 fill

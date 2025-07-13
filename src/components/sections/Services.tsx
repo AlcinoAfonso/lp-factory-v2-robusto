@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 import { cn } from '@/lib/utils';
 import { ServicesData } from '@/types/lp-config';
 import { Button } from '@/components/ui/Button';
@@ -15,9 +15,6 @@ function Services({ data }: ServicesProps) {
     ...(data.textColor && { color: data.textColor }),
   } as React.CSSProperties;
 
-  const optimizedImageSrc = data.image.src.includes('unsplash.com')
-    ? `${data.image.src.split('?')[0]}?w=600&q=80&auto=format&fit=crop`
-    : data.image.src;
 
   return (
     <section id={data.id} className={sectionDefaults.services.classes} style={sectionStyle}>
@@ -37,8 +34,8 @@ function Services({ data }: ServicesProps) {
           {/* Container da imagem */}
           <div className={sectionDefaults.services.imageContainer}>
             <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src={optimizedImageSrc}
+              <SmartImage
+                src={data.image.src}
                 alt={data.image.alt}
                 fill
                 className="object-cover"

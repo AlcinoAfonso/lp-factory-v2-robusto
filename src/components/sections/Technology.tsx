@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { TechnologyData } from '@/types/lp-config';
 import { Button } from '@/components/ui/Button';
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 import { sectionDefaults } from '@/config/sections';
 import { typography } from '@/config/typography';
 
@@ -15,9 +15,6 @@ function Technology({ data }: TechnologyProps) {
     ...(data.textColor && { color: data.textColor }),
   } as React.CSSProperties;
 
-  const optimizedImageSrc = data.image.src.includes('unsplash.com')
-    ? `${data.image.src.split('?')[0]}?w=600&q=80&auto=format&fit=crop`
-    : data.image.src;
 
   return (
     <section id={data.id} className={sectionDefaults.technology.classes} style={sectionStyle}>
@@ -58,8 +55,8 @@ function Technology({ data }: TechnologyProps) {
 
           <div className={sectionDefaults.technology.imageContainer}>
             <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src={optimizedImageSrc}
+              <SmartImage
+                src={data.image.src}
                 alt={data.image.alt}
                 fill
                 className="object-cover"

@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 import { AboutData } from '@/types/lp-config';
 
 interface AboutProps {
@@ -9,9 +9,6 @@ interface AboutProps {
 const About: React.FC<AboutProps> = ({ data }) => {
   const hasImage = data.image !== undefined;
 
-  const optimizedImageSrc = hasImage && data.image!.src.includes('unsplash.com')
-    ? `${data.image!.src.split('?')[0]}?w=600&q=80&auto=format&fit=crop`
-    : data.image?.src;
   
   return (
     <section
@@ -24,10 +21,10 @@ const About: React.FC<AboutProps> = ({ data }) => {
     >
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {hasImage && optimizedImageSrc && (
+          {hasImage && (
             <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src={optimizedImageSrc}
+              <SmartImage
+                src={data.image!.src}
                 alt={data.image!.alt}
                 fill
                 className="object-cover"
