@@ -1,3 +1,9 @@
+# CORREÇÃO URGENTE - next.config.js
+
+**Título do PR:** "HOTFIX: Corrigir erro build - remover quality inválido"
+
+```javascript
+// next.config.js
 /** @type {import('next').NextConfig} */
 const fs = require('fs');
 const path = require('path');
@@ -37,7 +43,7 @@ const nextConfig = {
   swcMinify: true,
   compress: true,
 
-  // 🔧 CORREÇÃO PRINCIPAL: Permitir imagens externas
+  // 🔧 CORREÇÃO: Configuração válida para Next.js 14
   images: {
     remotePatterns: [
       {
@@ -62,17 +68,16 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp'],
-    quality: 75,
+    // REMOVIDO: quality (não é válido aqui)
   },
+
   async rewrites() {
     const clients = loadClientsFromFolders();
     
-    // 🎯 FASE 1: Rewrite apenas homepage de domínios personalizados
     const clientRewrites = clients.map(({ domain, folder }) => ({
-      // Homepage: unicodigital.com.br/ → força [...slug] a capturar
       source: '/',
       has: [{ type: 'host', value: domain }],
-      destination: '/homepage', // Rota que não existe → [...slug] captura
+      destination: '/homepage',
     }));
 
     console.log(`\n🔗 Domínios configurados: ${clients.length}`);
@@ -83,9 +88,11 @@ const nextConfig = {
     
     return clientRewrites;
   },
+
   async redirects() { 
     return []; 
   },
 };
 
 module.exports = nextConfig;
+```
