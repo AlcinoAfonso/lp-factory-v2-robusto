@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 import { cn } from '@/lib/utils';
 import { HeroData } from '@/types/lp-config';
 import { Button } from '@/components/ui/Button';
@@ -15,10 +15,6 @@ function Hero({ data }: HeroProps) {
     ...(data.textColor && { color: data.textColor }),
   };
 
-  // 🔧 CORREÇÃO: URL Unsplash otimizada
-  const optimizedImageSrc = data.image.src.includes('unsplash.com')
-    ? `${data.image.src.split('?')[0]}?w=800&q=80&auto=format&fit=crop`
-    : data.image.src;
 
   return (
     <section id={data.id} className={sectionDefaults.hero.classes} style={sectionStyle}>
@@ -54,8 +50,8 @@ function Hero({ data }: HeroProps) {
           {/* Container 2: Imagem */}
           <div className={sectionDefaults.hero.imageContainer}>
             <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src={optimizedImageSrc}
+              <SmartImage
+                src={data.image.src}
                 alt={data.image.alt}
                 fill
                 priority
