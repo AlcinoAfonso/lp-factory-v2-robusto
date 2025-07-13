@@ -15,6 +15,11 @@ function Hero({ data }: HeroProps) {
     ...(data.textColor && { color: data.textColor }),
   };
 
+  // 🔧 CORREÇÃO: URL Unsplash otimizada
+  const optimizedImageSrc = data.image.src.includes('unsplash.com')
+    ? `${data.image.src.split('?')[0]}?w=800&q=80&auto=format&fit=crop`
+    : data.image.src;
+
   return (
     <section id={data.id} className={sectionDefaults.hero.classes} style={sectionStyle}>
       <div className={sectionDefaults.hero.container}>
@@ -50,7 +55,7 @@ function Hero({ data }: HeroProps) {
           <div className={sectionDefaults.hero.imageContainer}>
             <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src={data.image.src}
+                src={optimizedImageSrc}
                 alt={data.image.alt}
                 fill
                 priority

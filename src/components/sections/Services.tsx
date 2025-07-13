@@ -15,6 +15,10 @@ function Services({ data }: ServicesProps) {
     ...(data.textColor && { color: data.textColor }),
   } as React.CSSProperties;
 
+  const optimizedImageSrc = data.image.src.includes('unsplash.com')
+    ? `${data.image.src.split('?')[0]}?w=600&q=80&auto=format&fit=crop`
+    : data.image.src;
+
   return (
     <section id={data.id} className={sectionDefaults.services.classes} style={sectionStyle}>
       <div className={sectionDefaults.services.container}>
@@ -34,7 +38,7 @@ function Services({ data }: ServicesProps) {
           <div className={sectionDefaults.services.imageContainer}>
             <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src={data.image.src}
+                src={optimizedImageSrc}
                 alt={data.image.alt}
                 fill
                 className="object-cover"
@@ -54,9 +58,10 @@ function Services({ data }: ServicesProps) {
                 <p
                   className={cn(typography.bodyText.classes, 'mb-0')}
                   style={{ color: data.textColor }}
-                >
-                  {item.text}
-                </p>
+                  dangerouslySetInnerHTML={{
+                    __html: item.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                  }}
+                />
               </div>
             ))}
 
