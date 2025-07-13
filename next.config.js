@@ -1,9 +1,3 @@
-# CORREÇÃO URGENTE - next.config.js
-
-**Título do PR:** "HOTFIX: Corrigir erro build - remover quality inválido"
-
-```javascript
-// next.config.js
 /** @type {import('next').NextConfig} */
 const fs = require('fs');
 const path = require('path');
@@ -43,7 +37,6 @@ const nextConfig = {
   swcMinify: true,
   compress: true,
 
-  // 🔧 CORREÇÃO: Configuração válida para Next.js 14
   images: {
     remotePatterns: [
       {
@@ -68,7 +61,6 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp'],
-    // REMOVIDO: quality (não é válido aqui)
   },
 
   async rewrites() {
@@ -95,4 +87,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-```
