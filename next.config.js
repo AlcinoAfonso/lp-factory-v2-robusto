@@ -36,6 +36,34 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   compress: true,
+
+  // 🔧 CORREÇÃO PRINCIPAL: Permitir imagens externas
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'drive.google.com',
+      },
+    ],
+    formats: ['image/webp'],
+    quality: 75,
+  },
   async rewrites() {
     const clients = loadClientsFromFolders();
     

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { TechnologyData } from '@/types/lp-config';
 import { Button } from '@/components/ui/Button';
-import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import Image from 'next/image';
 import { sectionDefaults } from '@/config/sections';
 import { typography } from '@/config/typography';
 
@@ -14,6 +14,10 @@ function Technology({ data }: TechnologyProps) {
     ...(data.backgroundColor && { backgroundColor: data.backgroundColor }),
     ...(data.textColor && { color: data.textColor }),
   } as React.CSSProperties;
+
+  const optimizedImageSrc = data.image.src.includes('unsplash.com')
+    ? `${data.image.src.split('?')[0]}?w=600&q=80&auto=format&fit=crop`
+    : data.image.src;
 
   return (
     <section id={data.id} className={sectionDefaults.technology.classes} style={sectionStyle}>
@@ -53,15 +57,15 @@ function Technology({ data }: TechnologyProps) {
           </div>
 
           <div className={sectionDefaults.technology.imageContainer}>
-            <OptimizedImage
-              src={data.image.src}
-              alt={data.image.alt}
-              width={400}
-              height={400}
-              section="other"
-              className="w-full max-w-md mx-auto aspect-square rounded-2xl shadow-xl"
-              sizes="(max-width: 768px) 100vw, 400px"
-            />
+            <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src={optimizedImageSrc}
+                alt={data.image.alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 400px"
+              />
+            </div>
           </div>
         </div>
 
