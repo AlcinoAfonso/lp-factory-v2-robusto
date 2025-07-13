@@ -11,7 +11,7 @@ interface PageProps {
   };
 }
 
-// 🎯 FASE 1 - TAREFA 2: Roteador dinâmico para domínios personalizados
+// 🎯 FASE 2 - SISTEMA ÚNICO: Todos os clientes funcionam igual
 export default async function DynamicRouter({ params }: PageProps) {
   const headersList = headers();
   const host = headersList.get('host') || '';
@@ -20,11 +20,11 @@ export default async function DynamicRouter({ params }: PageProps) {
   console.log(`🔍 Domínio detectado: ${host}`);
   console.log(`📄 Slug: /${slug.join('/')}`);
 
-  // Buscar cliente que corresponde ao domínio
-  const clientFolder = findClientByDomain(host);
+  // Buscar cliente que corresponde ao domínio OU slug
+  const { clientFolder, isDirectAccess } = findClient(host, slug);
   
   if (!clientFolder) {
-    console.log(`❌ Nenhum cliente encontrado para domínio: ${host}`);
+    console.log(`❌ Nenhum cliente encontrado`);
     notFound();
   }
 
@@ -34,21 +34,21 @@ export default async function DynamicRouter({ params }: PageProps) {
   const clientConfig = loadClientConfig(clientFolder);
   
   if (!clientConfig) {
-    console.log(`❌ Configuração inválida para cliente: ${clientFolder}`);
+    console.log(`❌ Cliente ${clientFolder} sem domain.json`);
     notFound();
   }
 
-  console.log(`🎯 Homepage: ${clientConfig.homepage}`);
+  console.log(`🎯 Homepage configurada: ${clientConfig.homepage}`);
 
-  // Determinar qual LP renderizar baseado no slug
-  const lpToRender = determineLPFromSlug(slug, clientConfig);
+  // Determinar qual LP renderizar
+  const { lpToRender, adjustedSlug } = determineLPFromSlug(slug, clientConfig, isDirectAccess);
   
   if (!lpToRender) {
     console.log(`❌ LP não encontrada para slug: /${slug.join('/')}`);
     notFound();
   }
 
-  console.log(`✅ Renderizando: /${clientFolder}/${lpToRender.folder}/page.tsx`);
+  console.log(`✅ Renderizando: /${clientFolder}/${lpToRender.folder}/`);
 
   // Carregar e renderizar a LP
   const lpData = await loadLPData(clientFolder, lpToRender.folder);
@@ -61,34 +61,48 @@ export default async function DynamicRouter({ params }: PageProps) {
   return <LandingPage data={lpData} />;
 }
 
-// 🔍 Encontrar cliente por domínio
-function findClientByDomain(host: string): string | null {
+// 🔍 Encontrar cliente por domínio personalizado OU acesso direto
+function findClient(host: string, slug: string[]): { clientFolder: string | null; isDirectAccess: boolean } {
   const appDir = path.join(process.cwd(), 'src/app');
   
   try {
     const folders = fs.readdirSync(appDir, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
-      .filter(dirent => !['components', 'dashboard-lps'].includes(dirent.name));
+      .filter(dirent => !['components', 'dashboard-lps', '[...slug]'].includes(dirent.name));
 
+    // 1. PRIORIDADE: Buscar por domínio personalizado
     for (const folder of folders) {
       const domainFile = path.join(appDir, folder.name, 'domain.json');
       
       if (fs.existsSync(domainFile)) {
         try {
           const config = JSON.parse(fs.readFileSync(domainFile, 'utf8'));
-          if (config.active && config.domain === host) {
-            return folder.name;
+          if (config.active && config.domain && 
+              (config.domain === host || `www.${config.domain}` === host)) {
+            return { clientFolder: folder.name, isDirectAccess: false };
           }
         } catch (error) {
           console.warn(`⚠️ Erro ao ler ${domainFile}:`, error);
         }
       }
     }
+
+    // 2. FALLBACK: Buscar por acesso direto (.vercel.app/cliente/)
+    if (host.includes('.vercel.app') && slug.length > 0) {
+      const possibleClient = slug[0];
+      const clientPath = path.join(appDir, possibleClient);
+      const domainFile = path.join(clientPath, 'domain.json');
+      
+      if (fs.existsSync(clientPath) && fs.existsSync(domainFile)) {
+        return { clientFolder: possibleClient, isDirectAccess: true };
+      }
+    }
+
   } catch (error) {
     console.warn(`⚠️ Erro ao escanear pastas:`, error);
   }
 
-  return null;
+  return { clientFolder: null, isDirectAccess: false };
 }
 
 // 📋 Carregar configuração do cliente
@@ -105,23 +119,27 @@ function loadClientConfig(clientFolder: string) {
 }
 
 // 🎯 Determinar qual LP renderizar baseado no slug
-function determineLPFromSlug(slug: string[], clientConfig: any) {
-  const slugPath = slug.join('/');
+function determineLPFromSlug(slug: string[], clientConfig: any, isDirectAccess: boolean) {
+  // Se acesso direto, remove nome do cliente do slug
+  const adjustedSlug = isDirectAccess ? slug.slice(1) : slug;
+  const slugPath = adjustedSlug.join('/');
   
+  console.log(`🎯 Slug ajustado: ${slugPath} (direto: ${isDirectAccess})`);
+
   // Se não há slug ou slug vazio, usar homepage
-  if (slug.length === 0 || slugPath === '') {
+  if (adjustedSlug.length === 0 || slugPath === '' || slugPath === 'homepage') {
     const homepageLP = clientConfig.lps[clientConfig.homepage];
-    return homepageLP || null;
+    return { lpToRender: homepageLP || null, adjustedSlug };
   }
 
   // Buscar LP que corresponde ao slug
   for (const [lpKey, lpConfig] of Object.entries(clientConfig.lps)) {
     if ((lpConfig as any).slug === slugPath) {
-      return lpConfig;
+      return { lpToRender: lpConfig, adjustedSlug };
     }
   }
 
-  return null;
+  return { lpToRender: null, adjustedSlug };
 }
 
 // 📄 Carregar dados da LP
