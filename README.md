@@ -74,7 +74,7 @@ lp-teste-actions/
 │   │   │   └── Contact.tsx
 │   │   ├── 📁 ui/                     # Componentes UI
 │   │   │   ├── Button.tsx
-│   │   │   └── OptimizedImage.tsx
+│   │   │   └── SmartImage.tsx
 │   │   └── 📁 light/                  # Componentes otimizados
 │   │       └── [componentes light]
 │   │

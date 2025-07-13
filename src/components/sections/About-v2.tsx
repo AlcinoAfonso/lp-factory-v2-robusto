@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 
 interface AboutPropsV2 {
   data: {
@@ -41,7 +41,7 @@ function AboutV2({ data }: AboutPropsV2) {
         <div className={`grid gap-12 items-center ${hasImage ? 'md:grid-cols-2' : 'max-w-3xl mx-auto text-center'}`}>
           {hasImage && (
             <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
-              <Image
+              <SmartImage
                 src={image!.src}
                 alt={image!.alt}
                 fill

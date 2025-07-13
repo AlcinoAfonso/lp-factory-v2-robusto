@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 import { cn } from '@/lib/utils';
 
 interface ServicesPropsV2 {
@@ -66,7 +66,7 @@ function ServicesV2({ data }: ServicesPropsV2) {
           {image && (
             <div className="flex-1 w-full md:w-auto">
               <div className="relative w-full max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-xl">
-                <Image
+                <SmartImage
                   src={image.src}
                   alt={image.alt}
                   fill
