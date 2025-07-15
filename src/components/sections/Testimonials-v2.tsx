@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { LiteYoutubeEmbed } from '@/components/ui/LiteYoutubeEmbed';
 
 interface TestimonialsPropsV2 {
   data: {
@@ -84,15 +85,11 @@ function TestimonialsV2({ data }: TestimonialsPropsV2) {
           >
             {videos.map((video, index) => (
               <div key={index} className="flex-none w-full md:w-[calc(33.333%-1rem)] snap-center">
-                <div className="relative w-full pt-[56.25%] rounded-lg overflow-hidden shadow-lg">
-                  <iframe
-                    src={video.embedUrl}
-                    title={video.title || `Depoimento ${index + 1}`}
-                    className="absolute inset-0 w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+                <LiteYoutubeEmbed
+                  embedUrl={video.embedUrl}
+                  title={video.title || `Depoimento ${index + 1}`}
+                  className="shadow-lg"
+                />
               </div>
             ))}
           </div>
