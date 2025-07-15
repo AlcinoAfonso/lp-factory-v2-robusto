@@ -37,6 +37,15 @@ const nextConfig = {
   swcMinify: true,
   compress: true,
 
+  // \u2705 OTIMIZA\u00C7\u00D5ES DE BUILD
+  experimental: {
+    optimizeCss: true, // Minifica CSS
+    legacyBrowsers: false, // Remove polyfills desnecess\u00E1rios
+  },
+
+  // \u2705 OTIMIZA\u00C7\u00C3O DE FONTES
+  optimizeFonts: true,
+
   images: {
     remotePatterns: [
       {
@@ -58,6 +67,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'drive.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com', // \u2705 Adicionado para thumbnails
       },
     ],
     formats: ['image/webp'],
@@ -81,8 +94,27 @@ const nextConfig = {
     return clientRewrites;
   },
 
-  async redirects() { 
-    return []; 
+  async redirects() {
+    return [];
+  },
+  
+  // \u2705 HEADERS DE PERFORMANCE
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'Link',
+            value: '<https://fonts.googleapis.com>; rel=preconnect'
+          },
+        ],
+      },
+    ];
   },
 };
 
