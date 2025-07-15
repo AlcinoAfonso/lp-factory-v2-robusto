@@ -76,13 +76,15 @@ function hasValidConfig(config: any): boolean {
   return config && config.lps && typeof config.lps === 'object' && config.homepage;
 }
 
-// 🎯 SISTEMA CORRIGIDO: Escanear LPs baseado apenas no domain.json
+// 🎯 SISTEMA CORRIGIDO: Gerar URLs corretas (domínio personalizado quando ativo)
 function scanClientLPs(clientName: string, domainConfig: any): LP[] {
   const lps: LP[] = [];
   
   try {
     const lpsConfig = domainConfig.lps || {};
     const homepage = domainConfig.homepage;
+    const customDomain = domainConfig.domain;
+    const isDomainActive = domainConfig.active;
     
     console.log(`🔍 Escaneando ${clientName}:`, Object.keys(lpsConfig));
     
@@ -96,10 +98,23 @@ function scanClientLPs(clientName: string, domainConfig: any): LP[] {
         : path.join(process.cwd(), 'src/app', clientName, 'lp.json');
       
       if (fs.existsSync(lpJsonPath)) {
-        // Determinar URL baseada no slug
+        // 🎯 CORREÇÃO: Determinar URL baseada no domínio personalizado
         const slug = lpConfig.slug || '';
         const isHomepage = lpKey === homepage;
-        const lpUrl = slug ? `/${clientName}/${slug}` : `/${clientName}`;
+        
+        let lpUrl: string;
+        
+        if (isDomainActive && customDomain) {
+          // 🌐 Domínio personalizado ativo: usar URL absoluta
+          if (isHomepage) {
+            lpUrl = `https://${customDomain}`;
+          } else {
+            lpUrl = slug ? `https://${customDomain}/${slug}` : `https://${customDomain}`;
+          }
+        } else {
+          // 🔧 Domínio inativo: usar URL relativa da Vercel
+          lpUrl = slug ? `/${clientName}/${slug}` : `/${clientName}`;
+        }
         
         const newLP: LP = {
           name: lpConfig.title || lpKey,
@@ -152,6 +167,11 @@ function ClienteItem({ cliente }: { cliente: Cliente }) {
               <div className="flex items-center justify-between">
                 <span className="text-gray-700 group-hover:text-blue-700 font-medium">
                   🏠 {principalLP.name} (principal)
+                  {principalLP.url.startsWith('https://') && (
+                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                      DOMÍNIO ATIVO
+                    </span>
+                  )}
                 </span>
                 <span className="text-xs text-gray-400 group-hover:text-blue-500">
                   {principalLP.url}
@@ -173,6 +193,11 @@ function ClienteItem({ cliente }: { cliente: Cliente }) {
               <div className="flex items-center justify-between">
                 <span className="text-gray-700 group-hover:text-blue-700">
                   🔗 {lp.name}
+                  {lp.url.startsWith('https://') && (
+                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                      DOMÍNIO ATIVO
+                    </span>
+                  )}
                 </span>
                 <span className="text-xs text-gray-400 group-hover:text-blue-500">
                   {lp.url}
@@ -248,6 +273,9 @@ export default function DashboardLPs() {
             </p>
             <p className="mt-2">
               ✅ <strong>Sistema Universal:</strong> Detecta LPs através do domain.json (não requer page.tsx individual)
+            </p>
+            <p className="mt-2">
+              🌐 <strong>Domínios:</strong> <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">DOMÍNIO ATIVO</span> = links diretos para domínio personalizado
             </p>
           </div>
         </div>
