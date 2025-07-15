@@ -22,10 +22,11 @@ export const metadata: Metadata = {
 };
 
 // Viewport separado (Next.js 14 requirement)
+// \u2705 CORRE\u00C7\u00C3O: Removido maximum-scale para acessibilidade
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  // maximumScale: 1, // \u274C REMOVIDO - impedia zoom
 };
 
 export default function RootLayout({

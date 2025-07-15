@@ -31,6 +31,10 @@
     "bundleSize": {
       "warning": 250,
       "error": 500
+    },
+    "css": {
+      "inlineThreshold": 14336,
+      "purge": true
     }
   }
 }

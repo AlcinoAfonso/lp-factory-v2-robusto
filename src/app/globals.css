@@ -10,6 +10,10 @@
     --tamanho-base: 1rem;
     --padding-lateral-mobile: 1rem;
     --padding-lateral-md: 1.5rem;
+    
+    /* \u2705 CORES COM MELHOR CONTRASTE */
+    --text-gray-500: #6b7280; /* Substituir por #64748b para melhor contraste */
+    --text-gray-600: #4b5563; /* Substituir por #475569 para melhor contraste */
   }
 
   html {
@@ -72,5 +76,25 @@
   /* Classes customizadas para tipografia */
   .font-inter {
     font-family: var(--fonte-principal);
+  }
+
+  /* \u2705 MELHORIAS DE CONTRASTE */
+  .text-gray-500 {
+    color: #64748b; /* Melhor contraste que #6b7280 */
+  }
+  
+  .text-gray-600 {
+    color: #475569; /* Melhor contraste que #4b5563 */
+  }
+  
+  /* Para textos pequenos, garantir contraste m\u00EDnimo 4.5:1 */
+  .text-xs,
+  .text-sm {
+    @apply text-gray-700; /* For\u00E7a cor mais escura em textos pequenos */
+  }
+  
+  /* Bot\u00F5es com melhor contraste */
+  .btn-outline {
+    @apply border-2; /* Borda mais grossa para melhor visibilidade */
   }
 }
