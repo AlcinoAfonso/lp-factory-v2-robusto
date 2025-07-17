@@ -1,7 +1,0 @@
-import LandingPage from '@/components/LandingPage';
-import { LandingPageData } from '@/types/lp-config';
-import config from './lp.json';
-
-export default function Page() {
-  return <LandingPage data={config as LandingPageData} />;
-}
