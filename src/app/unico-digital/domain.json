@@ -4,7 +4,7 @@
   "homepage": "principal",
   "lps": {
     "principal": {
-      "folder": ".",
+      "folder": "lp-principal",
       "slug": "",
       "title": "LP Factory - Criação de Landing Pages",
       "active": true

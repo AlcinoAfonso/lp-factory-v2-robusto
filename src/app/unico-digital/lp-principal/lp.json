@@ -1,0 +1,141 @@
+{
+"metadata":{
+"title":"LP Factory - Criação de Landing Pages de Alta Conversão | A partir de R$ 497",
+"description":"Transforme visitantes em clientes com landing pages profissionais. Design moderno, carregamento ultra-rápido e otimização para conversão. Entrega em 48h.",
+"favicon":"/favicon.ico"
+},
+"sections":[
+{
+"id":"header",
+"type":"header",
+"backgroundColor":"#ffffff",
+"textColor":"#1a1a1a",
+"logo":{"type":"text","text":"LP Factory","subtitle":"Landing Pages Premium"},
+"navigation":[{"label":"Benefícios","href":"#benefits"},{"label":"Como Funciona","href":"#steps"},{"label":"Preços","href":"#services"},{"label":"Depoimentos","href":"#testimonials"}],
+"phone":{"display":"(21) 99999-8888","link":"tel:+5521999998888"}
+},
+{
+"id":"hero",
+"type":"hero",
+"backgroundColor":"#f8f9fa",
+"textColor":"#1a1a1a",
+"title":"Landing Pages que Transformam Visitantes em Clientes",
+"description":"Criamos páginas de alta conversão com design moderno, carregamento ultra-rápido e otimização para resultados. Sua LP pronta em 48 horas!",
+"primaryButton":{"text":"Quero Minha LP Agora","href":"https://wa.me/5521999998888?text=Olá!%20Quero%20criar%20uma%20landing%20page","variant":"primary"},
+"secondaryButton":{"text":"Ver Exemplos","href":"#services","variant":"outline"},
+"image":{"src":"https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800","alt":"Dashboard mostrando métricas de conversão"}
+},
+{
+"id":"benefits",
+"type":"benefits",
+"backgroundColor":"#ffffff",
+"textColor":"#1a1a1a",
+"title":"Por Que Escolher a LP Factory?",
+"items":[
+{"icon":"🚀","title":"Entrega em 48 Horas","description":"Sua landing page pronta e no ar em apenas 2 dias úteis"},
+{"icon":"📱","title":"100% Responsiva","description":"Perfeita em qualquer dispositivo: celular, tablet ou desktop"},
+{"icon":"⚡","title":"Ultra Rápida","description":"Carregamento instantâneo para não perder nenhuma conversão"},
+{"icon":"🎯","title":"Focada em Conversão","description":"Design estratégico que guia o visitante até a ação desejada"},
+{"icon":"📊","title":"SEO Otimizado","description":"Primeira página do Google com nossas técnicas avançadas"},
+{"icon":"🛠️","title":"Suporte 30 Dias","description":"Ajustes e manutenção inclusos por 30 dias após a entrega"}
+]
+},
+{
+"id":"services",
+"type":"services",
+"backgroundColor":"#f8f9fa",
+"textColor":"#1a1a1a",
+"title":"Escolha o Plano Ideal para Seu Negócio",
+"items":[
+{"icon":"💼","text":"**LP Essential** - R$ 497: Página única com até 5 seções, formulário de contato, integração WhatsApp"},
+{"icon":"🚀","text":"**LP Professional** - R$ 797: Tudo do Essential + animações, popup de saída, integração com email"},
+{"icon":"💎","text":"**LP Premium** - R$ 1.297: Tudo do Professional + múltiplas páginas, blog integrado, área de membros"},
+{"icon":"✅","text":"**Todos os planos incluem**: Domínio personalizado, SSL grátis, hospedagem por 1 ano"}
+],
+"image":{"src":"https://images.unsplash.com/photo-1551434678-e076c223a692?w=800","alt":"Equipe trabalhando em design de landing page"},
+"button":{"text":"Escolher Meu Plano","href":"https://wa.me/5521999998888?text=Quero%20saber%20mais%20sobre%20os%20planos","variant":"primary"}
+},
+{
+"id":"steps",
+"type":"steps",
+"backgroundColor":"#ffffff",
+"textColor":"#1a1a1a",
+"title":"Como Funciona?",
+"steps":[
+{"title":"1. Briefing Simplificado","description":"Você preenche um formulário rápido com as informações do seu negócio. Conversamos por WhatsApp para alinhar todos os detalhes."},
+{"title":"2. Criação e Aprovação","description":"Em 24h enviamos a primeira versão. Você revisa, sugere ajustes e aprovamos juntos o design final da sua landing page."},
+{"title":"3. Publicação e Otimização","description":"Publicamos sua LP com domínio personalizado e fazemos toda a otimização para Google. Você recebe os acessos e treinamento."},
+{"title":"4. Resultados e Suporte","description":"Acompanhamos os primeiros resultados e fazemos ajustes necessários. Suporte completo por 30 dias incluído."}
+],
+"button":{"text":"Começar Agora","href":"https://wa.me/5521999998888?text=Quero%20começar%20minha%20landing%20page","variant":"primary"}
+},
+{
+"id":"testimonials",
+"type":"testimonials",
+"backgroundColor":"#f8f9fa",
+"textColor":"#1a1a1a",
+"title":"O Que Nossos Clientes Dizem",
+"videos":[
+{"embedUrl":"https://www.youtube.com/embed/dQw4w9WgXcQ","title":"João Silva - Aumentou vendas em 150%"},
+{"embedUrl":"https://www.youtube.com/embed/dQw4w9WgXcQ","title":"Maria Santos - 300 leads em 30 dias"},
+{"embedUrl":"https://www.youtube.com/embed/dQw4w9WgXcQ","title":"Pedro Costa - ROI de 500%"}
+]
+},
+{
+"id":"faq",
+"type":"faq",
+"backgroundColor":"#ffffff",
+"textColor":"#1a1a1a",
+"title":"Perguntas Frequentes",
+"items":[
+{"question":"Quanto tempo leva para minha LP ficar pronta?","answer":"O prazo padrão é de 48 horas úteis após a aprovação do briefing. Para projetos urgentes, temos a opção express com entrega em 24h."},
+{"question":"Preciso ter um domínio próprio?","answer":"Não! Todos os nossos planos incluem domínio personalizado e hospedagem por 1 ano. Se você já tem um domínio, podemos usá-lo também."},
+{"question":"Vocês fazem alterações após a entrega?","answer":"Sim! Todos os planos incluem 30 dias de suporte com ajustes ilimitados. Após esse período, oferecemos planos de manutenção mensal."},
+{"question":"A landing page fica otimizada para o Google?","answer":"Com certeza! Todas as nossas LPs são criadas com as melhores práticas de SEO, incluindo meta tags, schema markup e otimização de velocidade."},
+{"question":"Posso integrar com minhas ferramentas?","answer":"Sim! Fazemos integração com WhatsApp, e-mail marketing (Mailchimp, RD Station, etc), pixel do Facebook, Google Analytics e muito mais."}
+]
+},
+{
+"id":"technology",
+"type":"technology",
+"backgroundColor":"#f8f9fa",
+"textColor":"#1a1a1a",
+"title":"Tecnologia de Ponta",
+"items":[
+{"icon":"⚛️","title":"Next.js 14","description":"Framework mais moderno para páginas ultra-rápidas"},
+{"icon":"🎨","title":"Tailwind CSS","description":"Design responsivo e customizável"},
+{"icon":"📱","title":"Mobile First","description":"Desenvolvida primeiro para celulares"},
+{"icon":"🔒","title":"SSL Grátis","description":"Segurança e confiança para seus visitantes"}
+],
+"image":{"src":"https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800","alt":"Código de programação em tela"},
+"button":{"text":"Falar com Especialista","href":"https://wa.me/5521999998888?text=Quero%20saber%20mais%20sobre%20a%20tecnologia","variant":"primary"}
+},
+{
+"id":"about",
+"type":"about",
+"backgroundColor":"#ffffff",
+"textColor":"#1a1a1a",
+"title":"Sobre a LP Factory",
+"description":"Somos especialistas em criar landing pages que convertem. Com mais de 500 projetos entregues, nossa equipe domina a arte de transformar visitantes em clientes.\n\nNossa missão é democratizar o acesso a páginas de alta conversão, oferecendo soluções profissionais a preços acessíveis para empresas de todos os tamanhos.\n\nCada projeto é único e recebe nossa atenção total, desde o briefing até os resultados. Não usamos templates genéricos - cada LP é criada do zero para atender exatamente às necessidades do seu negócio.",
+"image":{"src":"https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800","alt":"Equipe LP Factory trabalhando"}
+},
+{
+"id":"ctaFinal",
+"type":"ctaFinal",
+"backgroundColor":"#1a1a1a",
+"textColor":"#ffffff",
+"title":"Pronto para Multiplicar suas Conversões?",
+"subtitle":"Entre em contato agora e tenha sua landing page profissional em 48 horas",
+"button":{"text":"Quero Minha Landing Page","href":"https://wa.me/5521999998888?text=Olá!%20Vi%20o%20site%20e%20quero%20uma%20landing%20page","variant":"primary"}
+},
+{
+"id":"footer",
+"type":"footer",
+"backgroundColor":"#1a1a1a",
+"textColor":"#ffffff",
+"instagram":{"url":"https://instagram.com/lpfactory","text":"@lpfactory"},
+"copyright":"© 2025 LP Factory. Todos os direitos reservados.",
+"legalLink":{"text":"Termos de Uso e Privacidade","href":"/termos"}
+}
+]
+}
