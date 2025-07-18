@@ -45,15 +45,15 @@ export function TrackingDashboard({ clientName, onSave }: TrackingDashboardProps
   }
 
   function updateGTMSnippet(field: 'head' | 'body', value: string) {
-    setConfig((prev) => ({
-      ...prev,
-      gtm_snippet: {
-        ...prev.gtm_snippet,
-        [field]: value,
-      },
-    }));
-  }
-
+  setConfig((prev) => ({
+    ...prev,
+    gtm_snippet: {
+      head: prev.gtm_snippet?.head || '',
+      body: prev.gtm_snippet?.body || '',
+      [field]: value,
+    },
+  }));
+}
   function updateDirectId(path: string, value: string) {
     setConfig((prev) => {
       const newConfig = { ...prev } as any;
