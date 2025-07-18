@@ -146,8 +146,8 @@ async function loadGA4Script(gaId: string): Promise<void> {
 
 async function loadMetaPixelScript(pixelId: string): Promise<void> {
   return new Promise((resolve) => {
-    // Verificar se Meta Pixel já foi carregado
-    if (typeof window.fbq !== 'undefined' && window.fbq.loaded) {
+    // Verificar se Meta Pixel já foi carregado - versão corrigida
+    if (typeof window.fbq !== 'undefined') {
       resolve();
       return;
     }
@@ -157,12 +157,19 @@ async function loadMetaPixelScript(pixelId: string): Promise<void> {
     script.src = 'https://connect.facebook.net/en_US/fbevents.js';
     script.onload = () => {
       // Inicializar Meta Pixel
-      if (typeof window.fbq === 'function') {
-        window.fbq('init', pixelId);
-        window.fbq('track', 'PageView');
-        
-        console.info('✅ Meta Pixel carregado:', pixelId);
-      }
+      window.fbq = window.fbq || function (...args: any[]) {
+        (window.fbq.q = window.fbq.q || []).push(args);
+      };
+      window.fbq.push = window.fbq;
+      window.fbq.loaded = true;
+      window.fbq.version = '2.0';
+      window.fbq.q = [];
+
+      // Inicializar com o pixel ID
+      window.fbq('init', pixelId);
+      window.fbq('track', 'PageView');
+
+      console.info('✅ Meta Pixel carregado:', pixelId);
       resolve();
     };
     script.onerror = () => {
