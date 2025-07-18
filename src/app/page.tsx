@@ -59,7 +59,7 @@ export default async function HomePage() {
     return <div>Dados da LP não encontrados</div>;
   }
 
-  return <LandingPage data={lpData} />;
+  return <LandingPage data={lpData} clientName={clientFolder} />;
 }
 
 // 🔍 Encontrar cliente por domínio

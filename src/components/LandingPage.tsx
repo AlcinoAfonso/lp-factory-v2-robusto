@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 // Imports diretos - sem dynamic()
 import Header from './sections/Header';
 import Hero from './sections/Hero';
@@ -16,6 +17,9 @@ import Footer from './sections/Footer';
 import Gallery from './sections/Gallery';
 import Pricing from './sections/Pricing';
 import Contact from './sections/Contact';
+
+// Tracking Manager com dynamic import para otimização
+const TrackingManager = dynamic(() => import('./tracking/TrackingManager'), { ssr: false });
 
 import {
   LandingPageData,
@@ -35,9 +39,10 @@ import {
 
 interface LandingPageProps {
   data: LandingPageData;
+  clientName?: string;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ data }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ data, clientName }) => {
   const renderSection = (section: SectionData, index: number) => {
     const key = `${section.type}-${index}`;
 
@@ -77,8 +82,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ data }) => {
     }
   };
 
+  // Extrair nome do cliente se não fornecido
+  const extractedClientName = clientName ||
+    (typeof window !== 'undefined' ? window.location.hostname.split('.')[0] : 'unknown');
+
   return (
     <div className="min-h-screen">
+      {/* Sistema de Tracking Dinâmico */}
+      <TrackingManager clientName={extractedClientName} lpData={data} />
+
+      {/* Seções da Landing Page */}
       {data.sections.map((section, index) => renderSection(section, index))}
     </div>
   );
