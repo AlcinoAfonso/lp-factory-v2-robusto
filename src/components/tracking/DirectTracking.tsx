@@ -22,45 +22,7 @@ export function DirectTracking({ config }: DirectTrackingProps) {
     googleAds: false,
   });
 
-  const loadRequiredScripts = useCallback(async () => {
-    const promises: Promise<void>[] = [];
-
-    // Carregar Google Analytics 4
-    if (config.google_analytics) {
-      promises.push(loadGA4Script(config.google_analytics));
-    }
-
-    // Carregar Meta Pixel
-    if (config.meta_pixel) {
-      promises.push(loadMetaPixelScript(config.meta_pixel));
-    }
-
-    // Carregar Google Ads (sempre se tiver remarketing)
-    if (config.google_ads?.remarketing) {
-      promises.push(loadGoogleAdsScript(config.google_ads.remarketing));
-    }
-
-    await Promise.all(promises);
-    console.info('✅ DirectTracking: Todos os scripts carregados');
-  }, [config.google_analytics, config.meta_pixel, config.google_ads?.remarketing]);
-
-  const setupEventListeners = useCallback(() => {
-    // Event listeners para tracking_tags
-    document.addEventListener('click', handleTrackingClick);
-
-    // Event listeners para formulários
-    document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', handleFormSubmit);
-    });
-
-    console.info('✅ DirectTracking: Event listeners configurados');
-  }, [handleTrackingClick, handleFormSubmit]);
-
-  useEffect(() => {
-    loadRequiredScripts();
-    setupEventListeners();
-  }, [loadRequiredScripts, setupEventListeners]);
-
+  // Declarar PRIMEIRO as funções que serão usadas como dependências
   const handleTrackingClick = useCallback((event: Event) => {
     const target = event.target as HTMLElement;
     const trackingElement = target.closest('[data-tracking]') as HTMLElement;
@@ -110,6 +72,46 @@ export function DirectTracking({ config }: DirectTrackingProps) {
     }
   }, [config]);
 
+  // AGORA declarar setupEventListeners que usa as funções acima
+  const setupEventListeners = useCallback(() => {
+    // Event listeners para tracking_tags
+    document.addEventListener('click', handleTrackingClick);
+    
+    // Event listeners para formulários
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', handleFormSubmit);
+    });
+
+    console.info('✅ DirectTracking: Event listeners configurados');
+  }, [handleTrackingClick, handleFormSubmit]);
+
+  const loadRequiredScripts = useCallback(async () => {
+    const promises: Promise<void>[] = [];
+
+    // Carregar Google Analytics 4
+    if (config.google_analytics) {
+      promises.push(loadGA4Script(config.google_analytics));
+    }
+
+    // Carregar Meta Pixel
+    if (config.meta_pixel) {
+      promises.push(loadMetaPixelScript(config.meta_pixel));
+    }
+
+    // Carregar Google Ads (sempre se tiver remarketing)
+    if (config.google_ads?.remarketing) {
+      promises.push(loadGoogleAdsScript(config.google_ads.remarketing));
+    }
+
+    await Promise.all(promises);
+    console.info('✅ DirectTracking: Todos os scripts carregados');
+  }, [config.google_analytics, config.meta_pixel, config.google_ads?.remarketing]);
+
+  useEffect(() => {
+    loadRequiredScripts();
+    setupEventListeners();
+  }, [loadRequiredScripts, setupEventListeners]);
+
   return null; // Componente só para efeitos colaterais
 }
 
@@ -145,7 +147,7 @@ async function loadGA4Script(gaId: string): Promise<void> {
 async function loadMetaPixelScript(pixelId: string): Promise<void> {
   return new Promise((resolve) => {
     // Verificar se Meta Pixel já foi carregado
-    if (typeof window.fbq !== 'undefined' && (window.fbq as any).loaded) {
+    if (typeof window.fbq !== 'undefined' && window.fbq.loaded) {
       resolve();
       return;
     }
@@ -158,7 +160,7 @@ async function loadMetaPixelScript(pixelId: string): Promise<void> {
       if (typeof window.fbq === 'function') {
         window.fbq('init', pixelId);
         window.fbq('track', 'PageView');
-
+        
         console.info('✅ Meta Pixel carregado:', pixelId);
       }
       resolve();
