@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface DirectTrackingConfig {
   google_ads?: {
@@ -22,12 +22,7 @@ export function DirectTracking({ config }: DirectTrackingProps) {
     googleAds: false,
   });
 
-  useEffect(() => {
-    loadRequiredScripts();
-    setupEventListeners();
-  }, [config]);
-
-  async function loadRequiredScripts() {
+  const loadRequiredScripts = useCallback(async () => {
     const promises: Promise<void>[] = [];
 
     // Carregar Google Analytics 4
@@ -47,21 +42,26 @@ export function DirectTracking({ config }: DirectTrackingProps) {
 
     await Promise.all(promises);
     console.info('✅ DirectTracking: Todos os scripts carregados');
-  }
+  }, [config.google_analytics, config.meta_pixel, config.google_ads?.remarketing]);
 
-  function setupEventListeners() {
+  const setupEventListeners = useCallback(() => {
     // Event listeners para tracking_tags
     document.addEventListener('click', handleTrackingClick);
-    
+
     // Event listeners para formulários
     document.querySelectorAll('form').forEach(form => {
       form.addEventListener('submit', handleFormSubmit);
     });
 
     console.info('✅ DirectTracking: Event listeners configurados');
-  }
+  }, [handleTrackingClick, handleFormSubmit]);
 
-  function handleTrackingClick(event: Event) {
+  useEffect(() => {
+    loadRequiredScripts();
+    setupEventListeners();
+  }, [loadRequiredScripts, setupEventListeners]);
+
+  const handleTrackingClick = useCallback((event: Event) => {
     const target = event.target as HTMLElement;
     const trackingElement = target.closest('[data-tracking]') as HTMLElement;
     
@@ -77,7 +77,7 @@ export function DirectTracking({ config }: DirectTrackingProps) {
     }
 
     // Disparar conversão Google Ads
-    if (window.gtag) {
+    if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', {
         'send_to': conversionId
       });
@@ -85,30 +85,30 @@ export function DirectTracking({ config }: DirectTrackingProps) {
     }
 
     // Disparar evento Meta Pixel
-    if (window.fbq && config.meta_pixel) {
+    if (typeof window.fbq === 'function' && config.meta_pixel) {
       window.fbq('track', 'Lead');
       console.info('📱 Meta Pixel: Lead event disparado');
     }
-  }
+  }, [config]);
 
-  function handleFormSubmit(event: Event) {
+  const handleFormSubmit = useCallback((event: Event) => {
     const form = event.target as HTMLFormElement;
     const trackingTag = form.getAttribute('data-tracking') || 'formulario_contato';
     
     const conversionId = config.google_ads?.conversions?.[trackingTag];
     
-    if (conversionId && window.gtag) {
+    if (conversionId && typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', {
         'send_to': conversionId
       });
       console.info('📋 Formulário: Conversão disparada para', trackingTag);
     }
 
-    if (window.fbq && config.meta_pixel) {
+    if (typeof window.fbq === 'function' && config.meta_pixel) {
       window.fbq('track', 'Lead');
       console.info('📋 Formulário: Meta Pixel Lead disparado');
     }
-  }
+  }, [config]);
 
   return null; // Componente só para efeitos colaterais
 }
@@ -144,7 +144,8 @@ async function loadGA4Script(gaId: string): Promise<void> {
 
 async function loadMetaPixelScript(pixelId: string): Promise<void> {
   return new Promise((resolve) => {
-    if (window.fbq) {
+    // Verificar se Meta Pixel já foi carregado
+    if (typeof window.fbq !== 'undefined' && (window.fbq as any).loaded) {
       resolve();
       return;
     }
@@ -154,10 +155,16 @@ async function loadMetaPixelScript(pixelId: string): Promise<void> {
     script.src = 'https://connect.facebook.net/en_US/fbevents.js';
     script.onload = () => {
       // Inicializar Meta Pixel
-      window.fbq('init', pixelId);
-      window.fbq('track', 'PageView');
-      
-      console.info('✅ Meta Pixel carregado:', pixelId);
+      if (typeof window.fbq === 'function') {
+        window.fbq('init', pixelId);
+        window.fbq('track', 'PageView');
+
+        console.info('✅ Meta Pixel carregado:', pixelId);
+      }
+      resolve();
+    };
+    script.onerror = () => {
+      console.warn('⚠️ Erro ao carregar Meta Pixel');
       resolve();
     };
     document.head.appendChild(script);
