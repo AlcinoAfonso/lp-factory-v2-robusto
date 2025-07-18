@@ -58,7 +58,7 @@ export default async function UniversalRouter({ params }: PageProps) {
     notFound();
   }
 
-  return <LandingPage data={lpData} />;
+  return <LandingPage data={lpData} clientName={clientFolder} />;
 }
 
 // Encontrar cliente por domínio personalizado OU acesso direto
