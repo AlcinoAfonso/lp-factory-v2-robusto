@@ -29,7 +29,7 @@ export default function TrackingManager({ clientName, lpData }: TrackingManagerP
           console.info('🎯 TrackingManager: Configuração carregada para', clientName);
           console.info('📊 Método ativo:', config.method);
           console.info('✅ Configurado:', config.configured);
-
+          
           // Se já tem conversões detectadas, usar elas
           if (config.detected_conversions) {
             setDetectedConversions(Object.values(config.detected_conversions));
@@ -57,12 +57,16 @@ export default function TrackingManager({ clientName, lpData }: TrackingManagerP
     return null;
   }
 
-  // Determinar qual sistema usar
-  const useOldSystem =
-    trackingConfig &&
-    trackingConfig.configured &&
-    trackingConfig.direct_ids?.google_ads?.conversions &&
-    !trackingConfig.detected_conversions;
+  // ✅ CORREÇÃO: Verificar se é sistema antigo baseado em estrutura diferente
+  // Sistema antigo tinha direct_ids.google_ads.conversions
+  // Sistema novo tem detected_conversions
+  const hasOldSystemStructure = trackingConfig?.direct_ids && 
+    typeof (trackingConfig.direct_ids as any).google_ads?.conversions === 'object';
+  
+  const useOldSystem = trackingConfig && 
+                      trackingConfig.configured && 
+                      hasOldSystemStructure &&
+                      !trackingConfig.detected_conversions;
 
   const useNewSystem = !useOldSystem;
 
@@ -70,32 +74,46 @@ export default function TrackingManager({ clientName, lpData }: TrackingManagerP
     <>
       {/* Detecção Automática - sempre executar para LPs novas ou atualizadas */}
       {useNewSystem && (
-        <ConversionDetector lpData={lpData} clientName={clientName} onDetectionComplete={handleDetectionComplete} />
+        <ConversionDetector
+          lpData={lpData}
+          clientName={clientName}
+          onDetectionComplete={handleDetectionComplete}
+        />
       )}
 
       {/* Sistema Antigo - DirectTracking com tracking_tags manuais */}
       {useOldSystem && trackingConfig && (
         <>
-          {(trackingConfig.method === 'gtm' || trackingConfig.method === 'both') &&
-            trackingConfig.gtm_snippet && <GTMInjector snippet={trackingConfig.gtm_snippet} />}
+          {/* GTM Injection */}
+          {(trackingConfig.method === 'gtm' || trackingConfig.method === 'both') && 
+           trackingConfig.gtm_snippet && (
+            <GTMInjector snippet={trackingConfig.gtm_snippet} />
+          )}
 
-          {(trackingConfig.method === 'direct' || trackingConfig.method === 'both') &&
-            trackingConfig.direct_ids && <DirectTracking config={trackingConfig.direct_ids} />}
+          {/* Direct Tracking - Sistema Antigo */}
+          {(trackingConfig.method === 'direct' || trackingConfig.method === 'both') && 
+           trackingConfig.direct_ids && (
+            <DirectTracking config={trackingConfig.direct_ids} />
+          )}
         </>
       )}
 
       {/* Sistema Novo - DynamicTracking com detecção automática */}
       {useNewSystem && trackingConfig && trackingConfig.configured && (
         <>
-          {(trackingConfig.method === 'gtm' || trackingConfig.method === 'both') &&
-            trackingConfig.gtm_snippet && <GTMInjector snippet={trackingConfig.gtm_snippet} />}
+          {/* GTM Injection */}
+          {(trackingConfig.method === 'gtm' || trackingConfig.method === 'both') && 
+           trackingConfig.gtm_snippet && (
+            <GTMInjector snippet={trackingConfig.gtm_snippet} />
+          )}
 
+          {/* Dynamic Tracking - Sistema Novo */}
           {(trackingConfig.method === 'direct' || trackingConfig.method === 'both') && (
-            <DynamicTracking
+            <DynamicTracking 
               config={{
                 ...trackingConfig.direct_ids,
-                detected_conversions: trackingConfig.detected_conversions,
-              }}
+                detected_conversions: trackingConfig.detected_conversions
+              }} 
             />
           )}
         </>

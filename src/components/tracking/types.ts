@@ -9,6 +9,8 @@ export interface TrackingConfig {
   direct_ids?: {
     google_ads?: {
       remarketing?: string;
+      // ✅ CORREÇÃO: Manter conversions para compatibilidade com sistema antigo
+      conversions?: Record<string, string>;
     };
     meta_pixel?: string;
     google_analytics?: string;
@@ -27,14 +29,7 @@ export interface DetectedConversion {
   locations: string[];
 }
 
-export type ConversionType =
-  | 'whatsapp'
-  | 'phone'
-  | 'email'
-  | 'form'
-  | 'social'
-  | 'external'
-  | 'internal';
+export type ConversionType = 'whatsapp' | 'phone' | 'email' | 'form' | 'social' | 'external' | 'internal';
 
 // Declarações globais para TypeScript
 declare global {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { LandingPageData } from '@/types/lp-config';
 import type { DetectedConversion } from './types';
 import { detectConversionsFromLP } from './utils/detectionEngine';
@@ -15,34 +15,33 @@ export function ConversionDetector({ lpData, clientName, onDetectionComplete }: 
   const [detectedConversions, setDetectedConversions] = useState<DetectedConversion[]>([]);
   const [isDetecting, setIsDetecting] = useState(false);
 
-  useEffect(() => {
-    detectConversions();
-  }, [lpData]);
-
-  async function detectConversions() {
+  // ✅ CORREÇÃO: useCallback para evitar warning ESLint
+  const detectConversions = useCallback(async () => {
     setIsDetecting(true);
-
+    
     try {
       console.info(`🎯 ConversionDetector: Iniciando detecção para ${clientName}`);
-
+      
       // Executar detecção
       const conversions = detectConversionsFromLP(lpData);
-
+      
       setDetectedConversions(conversions);
       onDetectionComplete?.(conversions);
-
+      
       // Salvar no tracking.json (opcional - para cache)
       await saveDetectedConversions(clientName, conversions);
-
-      console.info(
-        `✅ ConversionDetector: Detecção concluída - ${conversions.length} conversões encontradas`,
-      );
+      
+      console.info(`✅ ConversionDetector: Detecção concluída - ${conversions.length} conversões encontradas`);
     } catch (error) {
       console.error('❌ ConversionDetector: Erro na detecção:', error);
     } finally {
       setIsDetecting(false);
     }
-  }
+  }, [lpData, clientName, onDetectionComplete]);
+
+  useEffect(() => {
+    detectConversions();
+  }, [detectConversions]);
 
   async function saveDetectedConversions(client: string, conversions: DetectedConversion[]) {
     try {
@@ -53,7 +52,7 @@ export function ConversionDetector({ lpData, clientName, onDetectionComplete }: 
           acc[conv.id] = conv;
           return acc;
         }, {} as Record<string, DetectedConversion>),
-        configured: false,
+        configured: false
       };
 
       // Salvar via API ou localStorage temporário
