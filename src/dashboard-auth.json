@@ -4,13 +4,20 @@
       "clientId": "fitnutri",
       "passwordHash": "demo123",
       "active": true,
-      "lastLogin": "2025-07-21T10:30:00.000Z"
+      "name": "FitNutri - Nutrição Personalizada",
+      "lastLogin": null
     },
     "unico-digital": {
-      "clientId": "unico-digital", 
-      "passwordHash": "demo123",
+      "clientId": "unico-digital",
+      "passwordHash": "demo123", 
       "active": true,
-      "lastLogin": "2025-07-21T09:15:00.000Z"
+      "name": "Único Digital - LP Factory",
+      "lastLogin": null
     }
+  },
+  "config": {
+    "sessionTimeout": 86400000,
+    "version": "1.0.0",
+    "lastUpdate": "2025-07-21T10:00:00.000Z"
   }
 }
