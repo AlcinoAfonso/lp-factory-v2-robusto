@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -16,6 +16,7 @@ interface SidebarProps {
 
 export function Sidebar({ clientId, clientData }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const navigation = [
     {
@@ -34,6 +35,16 @@ export function Sidebar({ clientId, clientData }: SidebarProps) {
       icon: DocumentIcon,
     },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/dashboard/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      router.push('/dashboard/login');
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -74,7 +85,10 @@ export function Sidebar({ clientId, clientData }: SidebarProps) {
       </nav>
 
       <div className="p-4 border-t border-gray-200">
-        <button className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        >
           <LogoutIcon className="mr-3 h-5 w-5 text-gray-400" />
           Sair
         </button>
