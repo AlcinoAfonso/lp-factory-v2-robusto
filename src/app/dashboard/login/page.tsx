@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginClient } from '../lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,10 +18,20 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const result = await loginClient(formData.clientId, formData.password);
-      
-      if (result.success) {
-        // Redirecionar para o dashboard do cliente
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clientId: formData.clientId,
+          password: formData.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         router.push(`/dashboard/${formData.clientId}`);
       } else {
         setError(result.error || 'Credenciais inválidas');
