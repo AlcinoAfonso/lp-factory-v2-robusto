@@ -1,0 +1,16 @@
+{
+  "clients": {
+    "fitnutri": {
+      "clientId": "fitnutri",
+      "passwordHash": "demo123",
+      "active": true,
+      "lastLogin": "2025-07-21T10:30:00.000Z"
+    },
+    "unico-digital": {
+      "clientId": "unico-digital", 
+      "passwordHash": "demo123",
+      "active": true,
+      "lastLogin": "2025-07-21T09:15:00.000Z"
+    }
+  }
+}
