@@ -22,6 +22,7 @@ interface ConversionDetectorProps {
 export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetectorProps) {
   const [conversions, setConversions] = useState<DetectedConversion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     detectConversions();
@@ -31,12 +32,23 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
     setIsLoading(true);
     
     try {
-      // Simular detecção de conversões
-      // Na implementação real, aqui seria chamada a API de detecção
-      const detected = mockDetectConversions(lpData);
-      setConversions(detected);
+      const response = await fetch(`/api/dashboard/${clientId}/detect-conversions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lpId, lpData }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setConversions(data.conversions || []);
+      } else {
+        const detected = mockDetectConversions(lpData);
+        setConversions(detected);
+      }
     } catch (error) {
       console.error('Erro ao detectar conversões:', error);
+      const detected = mockDetectConversions(lpData);
+      setConversions(detected);
     } finally {
       setIsLoading(false);
     }
@@ -62,6 +74,28 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
     );
   };
 
+  const saveConversions = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/dashboard/${clientId}/lp/${lpId}/conversions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversions }),
+      });
+
+      if (response.ok) {
+        alert('Configurações de conversão salvas com sucesso!');
+      } else {
+        alert('Erro ao salvar configurações. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar conversões:', error);
+      alert('Erro ao salvar configurações. Tente novamente.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -81,9 +115,18 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium text-gray-900">Conversões Detectadas</h2>
-        <span className="text-sm text-gray-500">
-          {conversions.length} conversões encontradas
-        </span>
+        <div className="flex items-center space-x-3">
+          <span className="text-sm text-gray-500">
+            {conversions.length} conversões encontradas
+          </span>
+          <button
+            onClick={saveConversions}
+            disabled={isSaving}
+            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isSaving ? 'Salvando...' : 'Salvar'}
+          </button>
+        </div>
       </div>
 
       {conversions.length > 0 ? (
@@ -164,7 +207,6 @@ function mockDetectConversions(lpData: any): DetectedConversion[] {
   
   if (!lpData?.sections) return conversions;
   
-  // Simular detecção baseada no lpData
   const mockConversions = [
     {
       id: 'whatsapp_5511999999999',
