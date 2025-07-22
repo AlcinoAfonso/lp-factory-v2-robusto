@@ -10,10 +10,11 @@
       "active": true
     },
     "emagrecimento": {
-      "folder": "lp-emagrecimento", 
+      "folder": "lp-emagrecimento",
       "slug": "emagrecimento",
       "title": "Perca 10kg em 90 Dias - FitNutri",
       "active": true
     }
-  }
+  },
+  "plan": "light"
 }
