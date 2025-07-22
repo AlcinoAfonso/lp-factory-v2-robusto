@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 interface ClientCredentials {
   clientId: string;
@@ -15,36 +13,25 @@ interface AuthConfig {
 }
 
 function loadAuthConfig(): AuthConfig {
-  try {
-    const authPath = path.join(process.cwd(), 'src/dashboard-auth.json');
+  // Usar configuração estática para produção
+  const staticConfig: AuthConfig = {
+    clients: {
+      fitnutri: {
+        clientId: 'fitnutri',
+        passwordHash: 'demo123',
+        active: true,
+        name: 'FitNutri - Nutrição Personalizada',
+      },
+      'unico-digital': {
+        clientId: 'unico-digital',
+        passwordHash: 'demo123',
+        active: true,
+        name: 'Único Digital - LP Factory',
+      },
+    },
+  };
 
-    if (!fs.existsSync(authPath)) {
-      const defaultConfig: AuthConfig = {
-        clients: {
-          fitnutri: {
-            clientId: 'fitnutri',
-            passwordHash: 'demo123',
-            active: true,
-            name: 'FitNutri - Nutrição Personalizada',
-          },
-          'unico-digital': {
-            clientId: 'unico-digital',
-            passwordHash: 'demo123',
-            active: true,
-            name: 'Único Digital - LP Factory',
-          },
-        },
-      };
-
-      fs.writeFileSync(authPath, JSON.stringify(defaultConfig, null, 2));
-      return defaultConfig;
-    }
-
-    return JSON.parse(fs.readFileSync(authPath, 'utf8'));
-  } catch (error) {
-    console.error('Erro ao carregar configuração de auth:', error);
-    return { clients: {} };
-  }
+  return staticConfig;
 }
 
 export async function POST(request: NextRequest) {
@@ -75,11 +62,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    client.lastLogin = new Date().toISOString();
-    fs.writeFileSync(
-      path.join(process.cwd(), 'src/dashboard-auth.json'),
-      JSON.stringify(authConfig, null, 2)
-    );
+    // Não tentar salvar lastLogin em produção (read-only)
+    console.log(`Login realizado: ${clientId} em ${new Date().toISOString()}`);
 
     const response = NextResponse.json({
       success: true,
