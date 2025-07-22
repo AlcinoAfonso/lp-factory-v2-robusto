@@ -24,7 +24,6 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  // ✅ CORREÇÃO: Usar useCallback para estabilizar a referência da função
   const detectConversions = useCallback(async () => {
     setIsLoading(true);
 
@@ -49,11 +48,11 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
     } finally {
       setIsLoading(false);
     }
-  }, [clientId, lpId, lpData]); // ✅ Todas as dependências incluídas
+  }, [clientId, lpId, lpData]);
 
   useEffect(() => {
     detectConversions();
-  }, [detectConversions]); // ✅ Agora detectConversions está estabilizada
+  }, [detectConversions]);
 
   const toggleConversion = (conversionId: string) => {
     setConversions(prev => 
@@ -169,7 +168,6 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
                   )}
                 </div>
                 
-                {/* Toggle */}
                 <div className="ml-4">
                   <label className="flex items-center">
                     <input
@@ -202,7 +200,6 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
   );
 }
 
-// Função mock para simular detecção
 function mockDetectConversions(lpData: any): DetectedConversion[] {
   const conversions: DetectedConversion[] = [];
   

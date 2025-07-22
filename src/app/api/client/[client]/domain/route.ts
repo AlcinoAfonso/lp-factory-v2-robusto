@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 
-// Interface para tipagem do domain.json
 interface DomainData {
   domain?: string;
   active?: boolean;
@@ -49,16 +48,6 @@ export async function GET(
 }
 }
 
-// Interface para tipagem do domain.json
-interface DomainData {
-  domain?: string;
-  active?: boolean;
-  homepage?: string;
-  lps?: Record<string, any>;
-  plan?: string;
-  [key: string]: any;
-}
-
 export async function POST(
   request: NextRequest,
   { params }: { params: { client: string } }
@@ -67,30 +56,25 @@ export async function POST(
     const clientId = params.client;
     const data = await request.json();
     
-    // Validar cliente
     const clientPath = path.join(process.cwd(), 'src/app', clientId);
     if (!fs.existsSync(clientPath)) {
       return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 404 });
     }
     
-    // Carregar domain.json atual
-  const domainPath = path.join(clientPath, 'domain.json');
-  let currentData: DomainData = {};
+    const domainPath = path.join(clientPath, 'domain.json');
+    let currentData: DomainData = {};
     
     if (fs.existsSync(domainPath)) {
       currentData = JSON.parse(fs.readFileSync(domainPath, 'utf8'));
     }
     
-    // Atualizar dados com tipagem correta
-  const updatedData: DomainData = {
+    const updatedData: DomainData = {
       ...currentData,
       domain: data.domain || currentData.domain || '',
       active: data.active !== undefined ? data.active : currentData.active || false,
-      // Manter outras configurações existentes
       ...data
     };
     
-    // Salvar domain.json
     fs.writeFileSync(domainPath, JSON.stringify(updatedData, null, 2), 'utf8');
     
     return NextResponse.json({ 
