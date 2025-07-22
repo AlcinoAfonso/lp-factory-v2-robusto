@@ -1,16 +1,12 @@
-// ============================================
-// CORREÇÃO: Erro TypeScript no plan-utils.ts
-// ============================================
-
 ```typescript src/app/dashboard/lib/plan-utils.ts
 import { PlanType, getPlanLimits } from '@/config/plans';
 
-export async function checkPlanAccess(clientId: string, feature: keyof ReturnType<typeof getPlanLimits>): Promise<boolean> {
+export async function checkPlanAccess(clientId: string, feature: string): Promise<boolean> {
   try {
     // Por enquanto, todos são Light
     const plan: PlanType = 'light';
     const limits = getPlanLimits(plan);
-    return Boolean(limits[feature]);
+    return Boolean((limits as any)[feature]);
   } catch (error) {
     console.error('Erro ao verificar plano:', error);
     return false;
@@ -32,12 +28,9 @@ export async function getClientPlan(clientId: string): Promise<PlanType> {
 }
 
 export function getPlanDisplayName(plan: PlanType): string {
-  const names: Record<PlanType, string> = {
-    light: 'LP Factory Light',
-    pro: 'LP Factory Pro', 
-    ultra: 'LP Factory Ultra'
-  };
-  
-  return names[plan] || 'LP Factory Light';
+  if (plan === 'light') return 'LP Factory Light';
+  if (plan === 'pro') return 'LP Factory Pro';
+  if (plan === 'ultra') return 'LP Factory Ultra';
+  return 'LP Factory Light';
 }
 ```
