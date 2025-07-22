@@ -1,6 +1,11 @@
-import { PlanType, getPlanLimits, canCreateLP } from '@/config/plans';
+// ============================================
+// CORREÇÃO: Erro TypeScript no plan-utils.ts
+// ============================================
 
-export async function checkPlanAccess(clientId: string, feature: keyof typeof getPlanLimits): Promise<boolean> {
+```typescript src/app/dashboard/lib/plan-utils.ts
+import { PlanType, getPlanLimits } from '@/config/plans';
+
+export async function checkPlanAccess(clientId: string, feature: keyof ReturnType<typeof getPlanLimits>): Promise<boolean> {
   try {
     // Por enquanto, todos são Light
     const plan: PlanType = 'light';
@@ -27,10 +32,12 @@ export async function getClientPlan(clientId: string): Promise<PlanType> {
 }
 
 export function getPlanDisplayName(plan: PlanType): string {
-  const names = {
+  const names: Record<PlanType, string> = {
     light: 'LP Factory Light',
-    pro: 'LP Factory Pro',
+    pro: 'LP Factory Pro', 
     ultra: 'LP Factory Ultra'
-  };
+  } as const;
+  
   return names[plan] || 'LP Factory Light';
 }
+```
