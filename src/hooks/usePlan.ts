@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
-import { PlanType, getPlanLimits, hasFeature, PlanLimits } from '@/config/plans';
+import {
+  PlanType,
+  getPlanFeatures,
+  hasFeature,
+  PlanFeatures,
+} from '@/config/plans';
 
 interface UsePlanReturn {
   plan: PlanType;
-  limits: PlanLimits;
-  hasFeature: (feature: keyof PlanLimits) => boolean;
+  features: PlanFeatures;
+  hasFeature: (feature: keyof PlanFeatures) => boolean;
+  pricePerLP: number;
   isLoading: boolean;
 }
 
@@ -24,10 +30,13 @@ export function usePlan(clientId?: string): UsePlanReturn {
     setIsLoading(false);
   }, [clientId]);
 
+  const features = getPlanFeatures(plan);
+
   return {
     plan,
-    limits: getPlanLimits(plan),
-    hasFeature: (feature: keyof PlanLimits) => hasFeature(plan, feature),
+    features,
+    hasFeature: (feature: keyof PlanFeatures) => hasFeature(plan, feature),
+    pricePerLP: features.pricePerLP,
     isLoading,
   };
 }

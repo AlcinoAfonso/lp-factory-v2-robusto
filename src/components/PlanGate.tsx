@@ -1,9 +1,9 @@
 import React from 'react';
-import { PlanType, hasFeature, PlanLimits } from '@/config/plans';
+import { PlanType, hasFeature, PlanFeatures, getPlanFeatures } from '@/config/plans';
 
 interface PlanGateProps {
   plan: PlanType;
-  feature: keyof PlanLimits;
+  feature: keyof PlanFeatures;
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }
@@ -15,10 +15,15 @@ export function PlanGate({ plan, feature, children, fallback = null }: PlanGateP
 }
 
 // Componente de upgrade
-export function UpgradeBanner({ currentPlan, requiredPlan }: {
-  currentPlan: PlanType;
-  requiredPlan: PlanType;
+export function UpgradeBanner({ 
+  currentPlan, 
+  requiredFeature 
+}: { 
+  currentPlan: PlanType; 
+  requiredFeature: keyof PlanFeatures;
 }) {
+  const requiredPlan = requiredFeature === 'dashboard' ? 'pro' : 'ultra';
+  
   return (
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
       <div className="flex items-start">
@@ -46,6 +51,27 @@ export function UpgradeBanner({ currentPlan, requiredPlan }: {
             </a>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Componente para mostrar preço
+export function PlanPricing({ plan, lpCount }: { plan: PlanType; lpCount: number }) {
+  const features = getPlanFeatures(plan);
+  const monthlyTotal = features.pricePerLP * lpCount;
+  
+  return (
+    <div className="bg-gray-50 rounded-lg p-4">
+      <h3 className="font-medium text-gray-900 mb-2">
+        Plano Atual: {plan.charAt(0).toUpperCase() + plan.slice(1)}
+      </h3>
+      <div className="text-sm text-gray-600">
+        <p>R$ {features.pricePerLP} por LP/mês</p>
+        <p>{lpCount} LP{lpCount !== 1 ? 's' : ''} ativa{lpCount !== 1 ? 's' : ''}</p>
+        <p className="font-semibold text-lg text-gray-900 mt-2">
+          Total: R$ {monthlyTotal}/mês
+        </p>
       </div>
     </div>
   );
