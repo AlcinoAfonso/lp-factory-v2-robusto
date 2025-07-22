@@ -1,4 +1,3 @@
-```typescript src/app/dashboard/lib/plan-utils.ts
 export async function checkPlanAccess(clientId: string, feature: string): Promise<boolean> {
   try {
     console.log('Verificando plano para:', clientId, feature);
@@ -19,4 +18,3 @@ export function getPlanDisplayName(plan: string): string {
   if (plan === 'ultra') return 'LP Factory Ultra';
   return 'LP Factory Light';
 }
-```
