@@ -29,13 +29,23 @@ export async function GET(
 
     return NextResponse.json(domainData);
 
-  } catch (error) {
-    console.error('❌ Erro ao carregar domain config:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
-  }
+} catch (error) {
+  console.error('❌ Erro ao carregar domain config:', error);
+  return NextResponse.json(
+    { error: 'Erro interno do servidor' },
+    { status: 500 }
+  );
+}
+}
+
+// Interface para tipagem do domain.json
+interface DomainData {
+  domain?: string;
+  active?: boolean;
+  homepage?: string;
+  lps?: Record<string, any>;
+  plan?: string;
+  [key: string]: any;
 }
 
 export async function POST(
@@ -53,15 +63,15 @@ export async function POST(
     }
     
     // Carregar domain.json atual
-    const domainPath = path.join(clientPath, 'domain.json');
-    let currentData = {};
+  const domainPath = path.join(clientPath, 'domain.json');
+  let currentData: DomainData = {};
     
     if (fs.existsSync(domainPath)) {
       currentData = JSON.parse(fs.readFileSync(domainPath, 'utf8'));
     }
     
     // Atualizar dados
-    const updatedData = {
+  const updatedData: DomainData = {
       ...currentData,
       domain: data.domain || currentData.domain || '',
       active: data.active !== undefined ? data.active : currentData.active || false,
