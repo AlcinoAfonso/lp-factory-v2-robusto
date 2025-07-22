@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface DetectedConversion {
   id: string;
@@ -24,13 +24,10 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    detectConversions();
-  }, [lpData]);
-
-  const detectConversions = async () => {
+  // ✅ CORREÇÃO: Usar useCallback para estabilizar a referência da função
+  const detectConversions = useCallback(async () => {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`/api/dashboard/${clientId}/detect-conversions`, {
         method: 'POST',
@@ -52,7 +49,11 @@ export function ConversionDetector({ clientId, lpId, lpData }: ConversionDetecto
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [clientId, lpId, lpData]); // ✅ Todas as dependências incluídas
+
+  useEffect(() => {
+    detectConversions();
+  }, [detectConversions]); // ✅ Agora detectConversions está estabilizada
 
   const toggleConversion = (conversionId: string) => {
     setConversions(prev => 
