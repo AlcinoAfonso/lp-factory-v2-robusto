@@ -36,7 +36,7 @@ export function getPlanDisplayName(plan: PlanType): string {
     light: 'LP Factory Light',
     pro: 'LP Factory Pro', 
     ultra: 'LP Factory Ultra'
-  } as const;
+  };
   
   return names[plan] || 'LP Factory Light';
 }
