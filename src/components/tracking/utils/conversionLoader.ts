@@ -1,5 +1,13 @@
 import type { EditableConversion, SavedConversion } from '../types/editable-conversions';
 
+// Tipos editáveis suportados pelo sistema
+type EditableConversionType = 'whatsapp' | 'phone' | 'email' | 'form' | 'social';
+
+// Helper para verificar se o tipo é editável
+function isEditableType(type: string): type is EditableConversionType {
+  return ['whatsapp', 'phone', 'email', 'form', 'social'].includes(type);
+}
+
 export async function loadEditableConversions(
   clientId: string,
   lpId: string
@@ -77,22 +85,24 @@ async function detectConversionsForLP(clientId: string, lpId: string): Promise<E
     const { detectConversionsFromLP } = await import('./detectionEngine');
     const detectedConversions = detectConversionsFromLP(lpData);
 
-    // Converter para formato editável
-    return detectedConversions.map((detected) => ({
-      id: detected.id,
-      type: detected.type,
-      destination: detected.destination,
-      label: detected.label,
-      elements_count: detected.elements_count,
-      locations: detected.locations,
-      enabled: false, // Desabilitado por padrão
-      google_ads_id: '',
-      // Campos editáveis vazios inicialmente
-      custom_label: undefined,
-      custom_destination: undefined,
-      custom_message: undefined,
-      custom_subject: undefined,
-    }));
+    // Filtrar apenas tipos editáveis e converter para formato correto
+    return detectedConversions
+      .filter((detected) => isEditableType(detected.type))
+      .map((detected) => ({
+        id: detected.id,
+        type: detected.type as EditableConversionType,
+        destination: detected.destination,
+        label: detected.label,
+        elements_count: detected.elements_count,
+        locations: detected.locations,
+        enabled: false, // Desabilitado por padrão
+        google_ads_id: '',
+        // Campos editáveis vazios inicialmente
+        custom_label: undefined,
+        custom_destination: undefined,
+        custom_message: undefined,
+        custom_subject: undefined,
+      }));
   } catch (error) {
     console.error('❌ Erro na detecção automática:', error);
     return [];
