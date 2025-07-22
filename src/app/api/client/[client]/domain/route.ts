@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+// Interface para tipagem do domain.json
+interface DomainData {
+  domain?: string;
+  active?: boolean;
+  homepage?: string;
+  lps?: Record<string, any>;
+  plan?: string;
+  [key: string]: any;
+}
+
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { client: string } }
@@ -70,7 +81,7 @@ export async function POST(
       currentData = JSON.parse(fs.readFileSync(domainPath, 'utf8'));
     }
     
-    // Atualizar dados
+    // Atualizar dados com tipagem correta
   const updatedData: DomainData = {
       ...currentData,
       domain: data.domain || currentData.domain || '',
