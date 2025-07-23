@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Save, X, Edit3, AlertCircle, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Save, X, Edit3, AlertCircle, CheckCircle, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { EditableConversion, ConversionValidationResult } from '../../../components/tracking/types/editable-conversions';
 import { ConversionValidators, ValidationMessages } from '../../../components/tracking/types/editable-conversions';
@@ -18,6 +18,7 @@ interface ConversionUIState {
   isLoading: boolean;
   hasUnsavedChanges: boolean;
   validationErrors: string[];
+  showPreview: boolean;
 }
 
 export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorProps) {
@@ -45,6 +46,7 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
           isLoading: false,
           hasUnsavedChanges: false,
           validationErrors: [],
+          showPreview: false,
         };
       });
       setUIState(initialUIState);
@@ -167,7 +169,10 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
             isLoading: false,
           }
         }));
-        setGlobalMessage({ type: 'success', text: 'Conversão salva com sucesso!' });
+        
+        // Auto-hide message after 3 seconds
+        setGlobalMessage({ type: 'success', text: `Conversão "${conversion.label}" salva com sucesso!` });
+        setTimeout(() => setGlobalMessage(null), 3000);
       } else {
         throw new Error(result.error || 'Erro ao salvar');
       }
@@ -186,7 +191,7 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
 
   // Cancelar edição
   const cancelEdit = (conversionId: string) => {
-    // Recarregar dados originais (simplificado - em produção, manter backup)
+    // Recarregar dados originais
     loadConversions();
   };
 
@@ -198,6 +203,18 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
         ...prev[conversionId],
         isEditing: !prev[conversionId]?.isEditing,
         validationErrors: [],
+        showPreview: false,
+      }
+    }));
+  };
+
+  // Toggle preview
+  const togglePreview = (conversionId: string) => {
+    setUIState(prev => ({
+      ...prev,
+      [conversionId]: {
+        ...prev[conversionId],
+        showPreview: !prev[conversionId]?.showPreview,
       }
     }));
   };
@@ -221,7 +238,8 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
           };
         });
         setUIState(newUIState);
-        setGlobalMessage({ type: 'success', text: 'Todas as conversões foram salvas com sucesso!' });
+        setGlobalMessage({ type: 'success', text: `Todas as ${conversions.length} conversões foram salvas com sucesso!` });
+        setTimeout(() => setGlobalMessage(null), 5000);
       } else {
         throw new Error(result.error || 'Erro ao salvar conversões');
       }
@@ -236,45 +254,56 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Detectando Conversões...</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">🔍 Detectando Conversões...</h2>
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-16 bg-gray-200 rounded"></div>
+            <div key={i} className="h-20 bg-gray-200 rounded-lg"></div>
           ))}
         </div>
+        <p className="text-sm text-gray-500 mt-4">
+          Analisando sua Landing Page para encontrar botões de WhatsApp, telefone, email e formulários...
+        </p>
       </div>
     );
   }
 
   const hasUnsavedChanges = Object.values(uiState).some(state => state.hasUnsavedChanges);
+  const enabledCount = conversions.filter(c => c.enabled).length;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-medium text-gray-900">Conversões Detectadas</h2>
+          <h2 className="text-lg font-medium text-gray-900">🎯 Conversões Detectadas</h2>
           <p className="text-sm text-gray-500 mt-1">
-            {conversions.length} conversões encontradas • Configure e personalize cada uma
+            {conversions.length} conversões encontradas • {enabledCount} habilitadas • Configure e personalize cada uma
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
           {hasUnsavedChanges && (
-            <span className="text-sm text-amber-600 font-medium">
-              Alterações não salvas
-            </span>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+              <span className="text-sm text-amber-600 font-medium">
+                Alterações não salvas
+              </span>
+            </div>
           )}
           <button
             onClick={saveAllConversions}
             disabled={isSaving || !hasUnsavedChanges}
             className={cn(
-              'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+              'px-4 py-2 text-sm font-medium rounded-md transition-all duration-200',
               hasUnsavedChanges
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             )}
           >
-            {isSaving ? 'Salvando...' : 'Salvar Todas'}
+            <div className="flex items-center space-x-2">
+              {isSaving && <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>}
+              <Save className="w-4 h-4" />
+              <span>{isSaving ? 'Salvando...' : 'Salvar Todas'}</span>
+            </div>
           </button>
         </div>
       </div>
@@ -282,18 +311,26 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
       {/* Mensagem global */}
       {globalMessage && (
         <div className={cn(
-          'mb-6 p-4 rounded-md border',
+          'mb-6 p-4 rounded-lg border transition-all duration-300',
           globalMessage.type === 'success' 
             ? 'bg-green-50 text-green-800 border-green-200' 
             : 'bg-red-50 text-red-800 border-red-200'
         )}>
-          <div className="flex items-center">
-            {globalMessage.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 mr-2" />
-            ) : (
-              <AlertCircle className="w-5 h-5 mr-2" />
-            )}
-            {globalMessage.text}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              {globalMessage.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 mr-2" />
+              ) : (
+                <AlertCircle className="w-5 h-5 mr-2" />
+              )}
+              {globalMessage.text}
+            </div>
+            <button 
+              onClick={() => setGlobalMessage(null)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
@@ -310,22 +347,25 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
                 isLoading: false,
                 hasUnsavedChanges: false,
                 validationErrors: [],
+                showPreview: false,
               }}
               onUpdate={(updates) => updateConversion(conversion.id, updates)}
               onSave={() => saveConversion(conversion.id)}
               onCancel={() => cancelEdit(conversion.id)}
               onToggleEdit={() => toggleEdit(conversion.id)}
+              onTogglePreview={() => togglePreview(conversion.id)}
             />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="text-center py-16">
+          <div className="text-gray-300 text-8xl mb-6">🔍</div>
+          <h3 className="text-xl font-medium text-gray-900 mb-3">
             Nenhuma conversão detectada
           </h3>
-          <p className="text-gray-500">
-            Não foram encontrados links de WhatsApp, telefone, email ou formulários nesta LP.
+          <p className="text-gray-500 max-w-md mx-auto">
+            Não foram encontrados links de WhatsApp, telefone, email ou formulários nesta Landing Page. 
+            Verifique se sua LP possui elementos de conversão.
           </p>
         </div>
       )}
@@ -333,7 +373,7 @@ export function ConversionsEditor({ clientId, lpId, lpData }: ConversionsEditorP
   );
 }
 
-// Componente individual de conversão
+// Componente individual de conversão - versão aprimorada
 interface ConversionCardProps {
   conversion: EditableConversion;
   uiState: ConversionUIState;
@@ -341,6 +381,7 @@ interface ConversionCardProps {
   onSave: () => void;
   onCancel: () => void;
   onToggleEdit: () => void;
+  onTogglePreview: () => void;
 }
 
 function ConversionCard({ 
@@ -349,7 +390,8 @@ function ConversionCard({
   onUpdate, 
   onSave, 
   onCancel, 
-  onToggleEdit 
+  onToggleEdit,
+  onTogglePreview
 }: ConversionCardProps) {
   const getConversionIcon = (type: string): string => {
     const icons: Record<string, string> = {
@@ -364,40 +406,65 @@ function ConversionCard({
 
   const effectiveLabel = conversion.custom_label || conversion.label;
   const effectiveDestination = conversion.custom_destination || conversion.destination;
+  const hasCustomizations = !!(conversion.custom_label || conversion.custom_destination || conversion.custom_message || conversion.custom_subject);
 
   return (
     <div className={cn(
-      'border rounded-lg transition-all',
-      uiState.isEditing ? 'border-blue-300 bg-blue-50' : 'border-gray-200',
-      uiState.hasUnsavedChanges && 'border-amber-300 bg-amber-50'
+      'border rounded-lg transition-all duration-200',
+      uiState.isEditing ? 'border-blue-300 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-gray-300',
+      uiState.hasUnsavedChanges && 'border-amber-300 bg-amber-50',
+      conversion.enabled ? 'opacity-100' : 'opacity-60'
     )}>
-      <div className="p-4">
+      <div className="p-5">
         {/* Header da conversão */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">{getConversionIcon(conversion.type)}</span>
-            <div>
-              <h3 className="font-medium text-gray-900">{effectiveLabel}</h3>
-              <p className="text-sm text-gray-500">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start space-x-4">
+            <span className="text-3xl">{getConversionIcon(conversion.type)}</span>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2 mb-1">
+                <h3 className="font-semibold text-gray-900">{effectiveLabel}</h3>
+                {hasCustomizations && (
+                  <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                    Personalizado
+                  </span>
+                )}
+                {conversion.enabled && conversion.google_ads_id && (
+                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                    Tracking Ativo
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-500 mb-2">
                 {conversion.elements_count} elemento{conversion.elements_count !== 1 ? 's' : ''} • 
                 Seções: {conversion.locations.join(', ')}
               </p>
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Destino:</strong> {effectiveDestination}
+              <p className="text-sm text-gray-600">
+                <strong>Destino:</strong> <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">{effectiveDestination}</code>
               </p>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Preview button */}
+            {(conversion.custom_message || conversion.custom_subject) && (
+              <button
+                onClick={onTogglePreview}
+                className="p-2 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                title="Ver preview"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+            )}
+
             {/* Toggle de habilitação */}
-            <label className="flex items-center">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={conversion.enabled}
                 onChange={(e) => onUpdate({ enabled: e.target.checked })}
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">
+              <span className="ml-2 text-sm text-gray-700 font-medium">
                 {conversion.enabled ? 'Habilitado' : 'Desabilitado'}
               </span>
             </label>
@@ -406,9 +473,9 @@ function ConversionCard({
             <button
               onClick={onToggleEdit}
               className={cn(
-                'p-2 rounded-md transition-colors',
+                'p-2 rounded-md transition-all duration-200',
                 uiState.isEditing 
-                  ? 'bg-blue-100 text-blue-700' 
+                  ? 'bg-blue-100 text-blue-700 shadow-sm' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               )}
               title={uiState.isEditing ? 'Cancelar edição' : 'Editar conversão'}
@@ -418,12 +485,31 @@ function ConversionCard({
           </div>
         </div>
 
+        {/* Preview das configurações personalizadas */}
+        {uiState.showPreview && (conversion.custom_message || conversion.custom_subject) && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-md border">
+            <h4 className="text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">Preview das Personalizações</h4>
+            {conversion.custom_message && (
+              <div className="mb-2">
+                <span className="text-xs font-medium text-gray-600">Mensagem WhatsApp:</span>
+                <p className="text-sm text-gray-800 italic">"{conversion.custom_message}"</p>
+              </div>
+            )}
+            {conversion.custom_subject && (
+              <div>
+                <span className="text-xs font-medium text-gray-600">Assunto Email:</span>
+                <p className="text-sm text-gray-800 italic">"{conversion.custom_subject}"</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Campos de edição */}
         {uiState.isEditing && (
           <div className="space-y-4 pt-4 border-t border-blue-200">
             {/* Label personalizado */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Label Personalizado
               </label>
               <input
@@ -433,6 +519,9 @@ function ConversionCard({
                 placeholder={conversion.label}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Deixe vazio para usar: "{conversion.label}"
+              </p>
             </div>
 
             {/* Campos específicos por tipo */}
@@ -443,28 +532,45 @@ function ConversionCard({
 
             {/* Google Ads Conversion ID */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Google Ads Conversion ID
+                {conversion.enabled && (
+                  <span className="text-red-500 ml-1">*</span>
+                )}
               </label>
               <input
                 type="text"
                 value={conversion.google_ads_id}
                 onChange={(e) => onUpdate({ google_ads_id: e.target.value })}
                 placeholder="AW-XXXXXXXXX/AbCdEfG"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={cn(
+                  "w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  conversion.enabled && !conversion.google_ads_id 
+                    ? "border-red-300 focus:border-red-500" 
+                    : "border-gray-300 focus:border-blue-500"
+                )}
               />
+              <p className="text-xs text-gray-500 mt-1">
+                {conversion.enabled 
+                  ? "Obrigatório para conversões habilitadas" 
+                  : "Será usado quando a conversão for habilitada"
+                }
+              </p>
             </div>
 
             {/* Erros de validação */}
             {uiState.validationErrors.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-md p-3">
                 <div className="flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 mr-2" />
+                  <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 mr-2 flex-shrink-0" />
                   <div>
                     <h4 className="text-sm font-medium text-red-800">Erros de validação:</h4>
-                    <ul className="text-sm text-red-700 mt-1 list-disc list-inside">
+                    <ul className="text-sm text-red-700 mt-1 space-y-1">
                       {uiState.validationErrors.map((error, index) => (
-                        <li key={index}>{error}</li>
+                        <li key={index} className="flex items-start">
+                          <span className="inline-block w-1 h-1 bg-red-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {error}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -473,19 +579,24 @@ function ConversionCard({
             )}
 
             {/* Botões de ação */}
-            <div className="flex justify-end space-x-3 pt-2">
+            <div className="flex justify-end space-x-3 pt-4">
               <button
                 onClick={onCancel}
-                className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                disabled={uiState.isLoading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={onSave}
-                disabled={uiState.isLoading}
-                className="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={uiState.isLoading || uiState.validationErrors.length > 0}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                {uiState.isLoading ? 'Salvando...' : 'Salvar'}
+                <div className="flex items-center space-x-2">
+                  {uiState.isLoading && <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>}
+                  <Save className="w-4 h-4" />
+                  <span>{uiState.isLoading ? 'Salvando...' : 'Salvar'}</span>
+                </div>
               </button>
             </div>
           </div>
@@ -505,9 +616,13 @@ function ConversionTypeFields({ conversion, onUpdate }: ConversionTypeFieldsProp
   switch (conversion.type) {
     case 'whatsapp':
       return (
-        <>
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-gray-900 border-b border-gray-200 pb-2">
+            ⚙️ Configurações WhatsApp
+          </h4>
+          
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Número WhatsApp Personalizado
             </label>
             <input
@@ -517,50 +632,69 @@ function ConversionTypeFields({ conversion, onUpdate }: ConversionTypeFieldsProp
               placeholder={conversion.destination}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">Formato: +5511999999999</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Formato: +5511999999999 • Original: <code className="bg-gray-100 px-1 rounded">{conversion.destination}</code>
+            </p>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Mensagem Personalizada
             </label>
             <textarea
               value={conversion.custom_message || ''}
               onChange={(e) => onUpdate({ custom_message: e.target.value || undefined })}
-              placeholder="Olá! Gostaria de saber mais..."
+              placeholder="Olá! Gostaria de saber mais sobre..."
               rows={3}
               maxLength={500}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {(conversion.custom_message || '').length}/500 caracteres
-            </p>
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Mensagem que aparecerá no WhatsApp</span>
+              <span className={cn(
+                (conversion.custom_message || '').length > 450 && 'text-amber-600 font-medium'
+              )}>
+                {(conversion.custom_message || '').length}/500
+              </span>
+            </div>
           </div>
-        </>
+        </div>
       );
 
     case 'phone':
       return (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Número de Telefone Personalizado
-          </label>
-          <input
-            type="text"
-            value={conversion.custom_destination || ''}
-            onChange={(e) => onUpdate({ custom_destination: e.target.value || undefined })}
-            placeholder={conversion.destination}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <p className="text-xs text-gray-500 mt-1">Formato: +5511999999999</p>
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-gray-900 border-b border-gray-200 pb-2">
+            ⚙️ Configurações Telefone
+          </h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Número de Telefone Personalizado
+            </label>
+            <input
+              type="text"
+              value={conversion.custom_destination || ''}
+              onChange={(e) => onUpdate({ custom_destination: e.target.value || undefined })}
+              placeholder={conversion.destination}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Formato: +5511999999999 • Original: <code className="bg-gray-100 px-1 rounded">{conversion.destination}</code>
+            </p>
+          </div>
         </div>
       );
 
     case 'email':
       return (
-        <>
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-gray-900 border-b border-gray-200 pb-2">
+            ⚙️ Configurações Email
+          </h4>
+          
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Personalizado
             </label>
             <input
@@ -570,10 +704,13 @@ function ConversionTypeFields({ conversion, onUpdate }: ConversionTypeFieldsProp
               placeholder={conversion.destination}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Original: <code className="bg-gray-100 px-1 rounded">{conversion.destination}</code>
+            </p>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Assunto Personalizado
             </label>
             <input
@@ -584,44 +721,75 @@ function ConversionTypeFields({ conversion, onUpdate }: ConversionTypeFieldsProp
               maxLength={200}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {(conversion.custom_subject || '').length}/200 caracteres
-            </p>
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Assunto que aparecerá no cliente de email</span>
+              <span className={cn(
+                (conversion.custom_subject || '').length > 180 && 'text-amber-600 font-medium'
+              )}>
+                {(conversion.custom_subject || '').length}/200
+              </span>
+            </div>
           </div>
-        </>
+        </div>
       );
 
     case 'social':
       return (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            URL da Rede Social Personalizada
-          </label>
-          <input
-            type="url"
-            value={conversion.custom_destination || ''}
-            onChange={(e) => onUpdate({ custom_destination: e.target.value || undefined })}
-            placeholder={conversion.destination}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            URLs permitidas: Instagram, Facebook, Twitter, LinkedIn, TikTok
-          </p>
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-gray-900 border-b border-gray-200 pb-2">
+            ⚙️ Configurações Rede Social
+          </h4>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              URL da Rede Social Personalizada
+            </label>
+            <input
+              type="url"
+              value={conversion.custom_destination || ''}
+              onChange={(e) => onUpdate({ custom_destination: e.target.value || undefined })}
+              placeholder={conversion.destination}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              URLs permitidas: Instagram, Facebook, Twitter, LinkedIn, TikTok
+            </p>
+            <p className="text-xs text-gray-500">
+              Original: <code className="bg-gray-100 px-1 rounded">{conversion.destination}</code>
+            </p>
+          </div>
         </div>
       );
 
     case 'form':
       return (
-        <div className="bg-gray-50 p-3 rounded-md">
-          <p className="text-sm text-gray-600">
-            📋 <strong>Conversões de formulário</strong> não permitem personalização de destino.
-            Apenas o Google Ads Conversion ID pode ser configurado.
-          </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="text-blue-400 text-2xl mr-3">📋</div>
+            <div>
+              <h4 className="text-sm font-medium text-blue-900 mb-2">
+                Conversão de Formulário
+              </h4>
+              <p className="text-sm text-blue-700 mb-2">
+                Conversões de formulário não permitem personalização de destino. 
+                Apenas o Google Ads Conversion ID e o status de habilitação podem ser configurados.
+              </p>
+              <p className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                Destino: <code>{conversion.destination}</code>
+              </p>
+            </div>
+          </div>
         </div>
       );
 
     default:
-      return null;
+      return (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <p className="text-sm text-gray-600">
+            Tipo de conversão "{conversion.type}" não possui configurações específicas.
+          </p>
+        </div>
+      );
   }
 }
 
