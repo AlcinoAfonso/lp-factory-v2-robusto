@@ -52,7 +52,7 @@ class GitHubService {
     return response.json();
   }
 
-  private async getFileContent(path: string): Promise<{ content: string; sha: string } | null> {
+  async getFileContent(path: string): Promise<{ content: string; sha: string } | null> {
     try {
       const response = await this.makeRequest(
         `/repos/${this.config.owner}/${this.config.repo}/contents/${path}`
