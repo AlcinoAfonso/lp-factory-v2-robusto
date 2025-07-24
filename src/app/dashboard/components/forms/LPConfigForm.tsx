@@ -10,9 +10,6 @@ interface LPConfigFormProps {
 
 export function LPConfigForm({ clientId, lpId, lpConfig }: LPConfigFormProps) {
   const [formData, setFormData] = useState({
-    googleAdsRemark: '',
-    metaPixelId: '',
-    googleAnalyticsId: '',
     title: lpConfig?.title || '',
     active: lpConfig?.active !== false,
   });
@@ -29,7 +26,7 @@ export function LPConfigForm({ clientId, lpId, lpConfig }: LPConfigFormProps) {
       const response = await fetch(`/api/dashboard/${clientId}/lp/${lpId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ title: formData.title, active: formData.active }),
       });
 
       if (!response.ok) throw new Error('Erro ao salvar');
@@ -89,54 +86,7 @@ export function LPConfigForm({ clientId, lpId, lpConfig }: LPConfigFormProps) {
           </div>
         </div>
 
-        {/* IDs de Tracking */}
-        <div className="space-y-4">
-          <h3 className="font-medium text-gray-900">IDs de Tracking</h3>
-          <p className="text-sm text-gray-500">
-            Configure os IDs específicos para esta LP (opcionais, caso queira sobrescrever os globais).
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Google Ads (Remarketing)
-              </label>
-              <input
-                type="text"
-                value={formData.googleAdsRemark}
-                onChange={(e) => setFormData(prev => ({ ...prev, googleAdsRemark: e.target.value }))}
-                placeholder="AW-XXXXXXXXX"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Meta Pixel ID
-              </label>
-              <input
-                type="text"
-                value={formData.metaPixelId}
-                onChange={(e) => setFormData(prev => ({ ...prev, metaPixelId: e.target.value }))}
-                placeholder="123456789012345"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Google Analytics 4
-              </label>
-              <input
-                type="text"
-                value={formData.googleAnalyticsId}
-                onChange={(e) => setFormData(prev => ({ ...prev, googleAnalyticsId: e.target.value }))}
-                placeholder="G-XXXXXXXXXX"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-        </div>
+
 
         {/* Botões */}
         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
