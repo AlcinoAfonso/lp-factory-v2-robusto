@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { getClientData, getLPData, validateLP } from '../../../lib/dashboard-utils';
-import { ConversionsEditor } from '../../../components/ConversionsEditor';
 import { LPConfigForm } from '../../../components/forms/LPConfigForm';
 
 interface LPConfigPageProps {
@@ -134,15 +133,8 @@ export default async function LPConfigPage({ params }: LPConfigPageProps) {
         </div>
       </div>
 
-      {/* 🚀 NOVO: Editor de Conversões com Interface de Edição */}
-      <ConversionsEditor 
-        clientId={clientId}
-        lpId={lpId}
-        lpData={lpData}
-      />
-
       {/* Formulário de Configuração */}
-      <LPConfigForm 
+      <LPConfigForm
         clientId={clientId}
         lpId={lpId}
         lpConfig={lpConfig}
