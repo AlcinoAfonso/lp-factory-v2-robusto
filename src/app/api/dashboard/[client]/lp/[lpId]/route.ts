@@ -1,5 +1,6 @@
+// src/app/api/dashboard/[client]/lp/[lpId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { readJson, writeJson } from '@/lib/persist';
+import { githubService } from '@/lib/github-service';
 
 export async function POST(
   request: NextRequest,
@@ -9,7 +10,6 @@ export async function POST(
     const { client: clientId, lpId } = params;
     const data = await request.json();
 
-    // Validar se há dados para atualizar
     if (!data.title && typeof data.active === 'undefined') {
       return NextResponse.json(
         { error: 'Nenhum dado para atualizar' },
@@ -17,28 +17,25 @@ export async function POST(
       );
     }
 
-    // Caminho do domain.json no repositório
     const domainPath = `src/app/${clientId}/domain.json`;
+    const currentFile = await githubService.getFileContent(domainPath);
 
-    // Ler conteúdo atual via helper
-    const domainData = await readJson(domainPath).catch(() => null);
-
-    if (!domainData) {
+    if (!currentFile || !currentFile.content) {
       return NextResponse.json(
         { error: 'domain.json não encontrado' },
         { status: 404 }
       );
     }
 
-    // Validar se a LP existe
+    const domainData = JSON.parse(Buffer.from(currentFile.content, 'base64').toString('utf8'));
+
     if (!domainData.lps || !domainData.lps[lpId]) {
       return NextResponse.json(
-        { error: `LP "${lpId}" não encontrada` },
+        { error: `LP \"${lpId}\" não encontrada` },
         { status: 404 }
       );
     }
 
-    // Atualizar apenas os campos fornecidos
     if (data.title !== undefined) {
       domainData.lps[lpId].title = data.title;
     }
@@ -47,18 +44,28 @@ export async function POST(
       domainData.lps[lpId].active = data.active;
     }
 
-    // Salvar via GitHub API
-    await writeJson(
-      domainPath,
-      domainData,
-      `chore: dashboard – update LP ${lpId} (title/active)`
-    );
+    const result = await githubService.updateFile({
+      path: domainPath,
+      content: JSON.stringify(domainData, null, 2),
+      message: `Dashboard update: ${clientId} - LP ${lpId} (title/active)`
+    });
 
-    return NextResponse.json({ success: true });
+    if (!result.success) {
+      throw new Error(result.error || 'Falha ao atualizar arquivo');
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Configurações da LP salvas com sucesso!',
+      commit: result.commit
+    });
   } catch (error) {
     console.error('Erro ao salvar configurações da LP:', error);
-    return NextResponse.json({ 
-      error: 'Erro interno do servidor' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Erro interno do servidor'
+      },
+      { status: 500 }
+    );
   }
 }
