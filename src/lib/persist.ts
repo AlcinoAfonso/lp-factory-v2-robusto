@@ -14,14 +14,9 @@ export async function writeJson(
   data: any,
   message: string
 ) {
-  const file = await githubService.getFileContent(path);
-  if (!file || !file.sha) {
-    throw new Error(`Arquivo não encontrado para update: ${path}`);
-  }
   await githubService.updateFile({
     path,
     content: JSON.stringify(data, null, 2),
-    sha: file.sha,
     message
   });
 }
