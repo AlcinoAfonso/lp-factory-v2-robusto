@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { saveAndDeploy } from '@/lib/dashboard-api';
 
 interface Conversion {
   id: string;
@@ -30,6 +29,7 @@ export default function ConversionsEditor({
   const [saveTimeoutId, setSaveTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   // Debounced save function (3 segundos)
+  // ✅ CORREÇÃO: Usar nova API save-and-deploy em vez de /conversions
   const debouncedSave = useCallback(async (updatedConversions: Conversion[]) => {
     // Limpar timeout anterior
     if (saveTimeoutId) {
@@ -44,40 +44,59 @@ export default function ConversionsEditor({
     const timeoutId = setTimeout(async () => {
       try {
         setSaveStatus('publishing');
-        
-        // Preparar dados para tracking.json
+
+        // ✅ CORREÇÃO: Preparar dados para nova API save-and-deploy
         const trackingData = {
-          conversions: updatedConversions.reduce((acc, conv) => {
+          client: clientId,
+          method: 'direct',
+          detected_conversions: updatedConversions.reduce((acc, conv) => {
             acc[conv.id] = {
+              id: conv.id,
               type: conv.type,
-              label: conv.label,
               destination: conv.destination,
-              enabled: conv.enabled,
-              ...(conv.message && { message: conv.message }),
-              ...(conv.subject && { subject: conv.subject })
+              label: conv.label,
+              elements_count: 1,
+              locations: ['detected'],
+              tracking_enabled: conv.enabled,
+              google_ads_id: '', // Será preenchido pelo usuário no dashboard
+              ...(conv.message && { custom_message: conv.message }),
+              ...(conv.subject && { custom_subject: conv.subject })
             };
             return acc;
-          }, {} as Record<string, any>)
+          }, {} as Record<string, any>),
+          configured: true,
+          last_updated: new Date().toISOString()
         };
 
-        // Chamar nossa API save-and-deploy
-        const result = await saveAndDeploy({
-          client: clientId,
-          type: 'tracking',
-          lpId: lpId,
-          data: trackingData
+        // ✅ CORREÇÃO: Chamar nova API save-and-deploy
+        const response = await fetch(`/api/dashboard/${clientId}/save-and-deploy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'tracking',
+            lpId: lpId,
+            data: trackingData
+          })
         });
 
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+
         setSaveStatus('published');
-        
+        console.info('✅ Conversões publicadas com sucesso:', result);
+
         // Voltar ao estado idle após 2 segundos
         setTimeout(() => setSaveStatus('idle'), 2000);
 
       } catch (error) {
-        console.error('Save and deploy error:', error);
+        console.error('❌ Erro no save and deploy:', error);
         setSaveStatus('error');
         setErrorMessage(error instanceof Error ? error.message : 'Erro ao publicar alterações');
-        
+
         // Voltar ao estado idle após 5 segundos
         setTimeout(() => setSaveStatus('idle'), 5000);
       }
@@ -107,8 +126,8 @@ export default function ConversionsEditor({
       idle: { color: 'text-gray-500', text: '' },
       saving: { color: 'text-blue-500', text: 'Salvando...' },
       saved: { color: 'text-green-500', text: 'Salvo' },
-      publishing: { color: 'text-orange-500', text: 'Publicando...' },
-      published: { color: 'text-green-600', text: 'Publicado!' },
+      publishing: { color: 'text-orange-500', text: 'Publicando no GitHub...' },
+      published: { color: 'text-green-600', text: 'Publicado! Deploy automático iniciado' },
       error: { color: 'text-red-500', text: 'Erro ao publicar' }
     };
 
@@ -154,6 +173,25 @@ export default function ConversionsEditor({
         </h3>
         <StatusIndicator />
       </div>
+
+      {/* Info sobre o novo sistema */}
+      {saveStatus === 'published' && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-green-700">
+                <strong>Sucesso!</strong> As alterações foram commitadas no GitHub e o deploy automático foi iniciado. 
+                As mudanças estarão disponíveis na LP em alguns minutos.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error message */}
       {errorMessage && (
@@ -278,10 +316,10 @@ export default function ConversionsEditor({
         ))}
       </div>
 
-      {/* Info footer */}
+      {/* Info footer - atualizado */}
       <div className="text-sm text-gray-500 bg-blue-50 p-3 rounded-md">
-        <p className="font-medium text-blue-700 mb-1">💡 Como funciona:</p>
-        <p>As alterações são salvas automaticamente após 3 segundos de inatividade e publicadas diretamente na LP.</p>
+        <p className="font-medium text-blue-700 mb-1">🚀 Sistema Save-and-Deploy:</p>
+        <p>As alterações são salvas automaticamente após 3 segundos, commitadas no GitHub e deployadas automaticamente na LP via Vercel.</p>
       </div>
     </div>
   );
